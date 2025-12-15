@@ -1,0 +1,49 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# --- Virtual environments ---
+venv/
+env/
+.venv/
+.env/
+
+# --- Distribution / packaging ---
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# --- PyInstaller ---
+*.spec
+
+# --- Unit test / coverage ---
+htmlcov/
+.coverage
+.coverage.*
+.cache
+pytest_cache/
+nosetests.xml
+coverage.xml
+
+# --- IDE / Editor ---
+.vscode/
+.idea/
+*.swp
+
+# --- Logs ---
+*.log
+
+# --- Django / Flask / FastAPI (opcjonalnie) ---
+*.sqlite3
+instance/
+*.db
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+
+# --- Misc ---
+*.DS_Store
