@@ -1,9 +1,8 @@
 import uuid
-import random
-from sqlalchemy import Column, Float, Integer, String, ForeignKey, BigInteger, DateTime, create_engine
-from sqlalchemy.orm import declarative_base, relationship, Session
+from utils import generate_nanoid
+from sqlalchemy import Column, Float, Integer, Numeric, String, ForeignKey, BigInteger, DateTime, func, CheckConstraint
+from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.dialects.postgresql import UUID
-from datetime import datetime
 
 
 Base = declarative_base()
@@ -12,30 +11,40 @@ Base = declarative_base()
 class Users(Base):
     __tablename__ = "users"
 
-    user_id = Column(
-        UUID(as_uuid=True),
-        primary_key=True,
-        default=uuid.uuid4
-    )
-    email = Column(String(120), unique=True)
-    account_id = Column(Integer, ForeignKey("accounts.account_id"))
-    account = relationship("Accounts")
+    user_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    email = Column(String(120), unique=True, nullable=False)
 
-    def __repr__(self):
-        return f"<User(id={self.id}, name='{self.name}', email='{self.email}')>"
+    accounts = relationship("Accounts", back_populates="user")
+
+
     
 class Accounts(Base):
     __tablename__ = "accounts"
 
     account_id = Column(
-        BigInteger,
+        String(12),
         primary_key=True,
-        unique=True
+        default=generate_nanoid
     )
-    ammount = Column(Float)
 
-    def __repr__(self):
-        return f"<Accounts(account_id={self.account_id}, ammount={self.ammount})>"
+    account_number = Column(
+        Numeric(26, 0),
+        unique=True,
+        nullable=False
+    )
+
+    user_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("users.user_id", ondelete="RESTRICT"),
+        nullable=False
+    )
+
+    amount = Column(Float, default=0.0)
+
+    user = relationship("Users", back_populates="accounts")
+
+    transactions_from = relationship("Transactions", foreign_keys="Transactions.account_id_from", backref="from_account")
+    transactions_to = relationship("Transactions", foreign_keys="Transactions.account_id_to", backref="to_account")
     
 class Transactions(Base):
     __tablename__ = "transactions"
@@ -45,19 +54,29 @@ class Transactions(Base):
         primary_key=True,
         default=uuid.uuid4
     )
-    account_id_from = Column(Integer, ForeignKey("accounts.account_id"))
-    account_id_to = Column(Integer, ForeignKey("accounts.account_id"))
-    date = Column(DateTime)
-    amount = Column(Float) 
+    account_id_from = Column(
+    String(12),
+    ForeignKey("accounts.account_id", ondelete="CASCADE"),
+    nullable=False
+)
 
-def __repr__(self):
-        return (
-            f"<Transactions("
-            f"transaction_id={self.transaction_id}, "
-            f"from={self.account_id_from}, "
-            f"to={self.account_id_to}, "
-            f"date={self.date}, "
-            f"amount={self.amount}"
-            f")>"
-        )
+    account_id_to = Column(
+        String(12),
+        ForeignKey("accounts.account_id", ondelete="CASCADE"),
+        nullable=False
+)
+
+
+    date = Column(DateTime,
+         default=func.now(), 
+         nullable=False)
+    
+    amount = Column(Float,
+         nullable=False) 
+
+    __table_args__ = (
+        CheckConstraint("amount > 0", name = "invalid_range_value_amount"),
+    )
+
+
 
