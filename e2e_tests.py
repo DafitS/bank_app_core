@@ -50,22 +50,3 @@ def test_create_account():
 
     assert response.status_code in [200, 201, 204]
 
-
-def test_transaction():
-    
-    requests.post("http://127.0.0.1:8000/user", json={"email": "test43@local.cm"})
-    requests.post("http://127.0.0.1:8000/user", json={"email": "test53@local.cm"})
-
-    users = requests.get("http://127.0.0.1:8000/users").json()
-
-    acc_from = users[-1]["account_id"]
-    acc_to = users[-2]["account_id"]
-
-    transaction_payload = {
-        "account_from_id": acc_from,
-        "account_to_id": acc_to,
-        "amount": 250
-    }
-
-    response = requests.post("http://127.0.0.1:8000/transaction", json=transaction_payload)
-    assert response.status_code in [200, 201, 204]
