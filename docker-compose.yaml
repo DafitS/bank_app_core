@@ -1,0 +1,25 @@
+services:
+  postgres18:
+    image: postgres:18.1
+    container_name: postgres18
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: "1234"
+      POSTGRES_DB: bank_app_core
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres18_data:/var/lib/postgresql
+
+  bank_app:
+    build: .
+    container_name: bank_app
+    restart: always
+    depends_on:
+      - postgres18
+    ports:
+      - "8000:8000"
+
+volumes:
+  postgres18_data:
