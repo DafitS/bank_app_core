@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-import re
+import re, os
 import exceptions as ex
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -7,10 +7,14 @@ from sqlalchemy.exc import IntegrityError, NoResultFound
 from orm import Accounts, Users, Transactions
 from utils import generate_unique_account_number
 
+
 class BankAppHandler:
     def __init__(self):
-        self.engine = create_engine('postgresql://postgres:1234@localhost:5432/bank_app2')
+        value = os.getenv("URL")
+        self.engine = create_engine(value)
+
         self.session = sessionmaker(bind=self.engine, expire_on_commit=False)
+
 
     @contextmanager
     def get_session(self):
@@ -42,13 +46,27 @@ class BankAppHandler:
                 user_id=user_id
             )
             session.add(account)
-            return account
+            session.flush()
+            return {
+                "account_id": account.account_id,
+                "account_number": account.account_number,
+                "user_id": user_id, "amount": account.amount
+                }
 
 
     def get_accounts(self):
         with self.get_session() as session:
             accounts = session.query(Accounts).all()
-            return [(acc.account_number, acc.amount) for acc in accounts]
+            return [
+                {
+                    "account_id": acc.account_id,
+                    "account_number": acc.account_number,
+                    "amount": acc.amount,
+                    "user_id": acc.user_id
+                }
+                for acc in accounts
+            ]
+
 
     def delete_account(self, number):
         with self.get_session() as session:
@@ -68,14 +86,26 @@ class BankAppHandler:
                 user_id = user.user_id
             )
             session.add(account)
+            session.flush()
 
-            return user
+            return {
+                "id": user.user_id,
+                "email": user.email,
+                "account_id": account.account_id
+            }
 
     def get_users(self):
         with self.get_session() as session:
             users = session.query(Users).all()
-            return [(u.user_id, u.email, [acc.account_number for acc in u.accounts]) for u in users]
-
+            result = []
+            for u in users:
+                result.append({
+                    "id": u.user_id,
+                    "email": u.email,
+                    "account_id": u.accounts[0].account_id if u.accounts else None
+                })
+            return result 
+        
     def delete_user(self, user_id):
         with self.get_session() as session:
             user = session.query(Users).filter_by(user_id=user_id).one_or_none()
@@ -93,8 +123,17 @@ class BankAppHandler:
             account = session.query(Accounts).filter_by(account_number=number).first()
             if account is None:
                 raise ex.NotFoundError(f"Account {number} not found")
+
             account.amount = new_amount
-            return account
+            session.flush()
+
+            return {
+                "account_id": account.account_id,
+                "account_number": account.account_number,
+                "amount": account.amount,
+                "user_id": account.user_id
+            }
+
 
     def update_user(self, user_id, new_email):
         EMAIL_REGEX = re.compile(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)")
@@ -112,7 +151,13 @@ class BankAppHandler:
                 raise ex.DuplictedError("Email already in use!")
 
             user.email = new_email
-            return user
+            session.flush()
+
+            return {
+                "id": user.user_id,
+                "email": user.email
+            }
+
         
     def create_transaction(self, account_from_id, account_to_id, amount):
         if account_from_id == account_to_id:
@@ -143,5 +188,11 @@ class BankAppHandler:
             )
 
             session.add(transaction)
-            return transaction
+            session.flush()
+            return {
+                "transaction_id": transaction.transaction_id,
+                "account_from_id": account_from_id,
+                "account_to_id": account_to_id,
+                "amount": amount
+            }
 
