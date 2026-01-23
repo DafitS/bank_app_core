@@ -4,6 +4,7 @@ from handler import BankAppHandler
 from pydantic import BaseModel
 from uuid import UUID
 from datetime import datetime
+from fastapi.responses import JSONResponse
 
 api = FastAPI()
 bank = BankAppHandler()
@@ -94,5 +95,7 @@ def update_account(body: UpdateAccount):
         raise HTTPException(status_code=400, detail="Conversion amount error!")
     except Exception:
         raise HTTPException(status_code=500, detail="Internal server error")
-
-#server less , pon 7 
+    
+@api.get("/health")
+def health_check():
+    return JSONResponse(content={"status": "ok"})
