@@ -4,8 +4,7 @@ on:
   push:
   pull_request:
   workflow_dispatch:
-env:
-  URL: ${{secrets.URL}}
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -20,6 +19,9 @@ jobs:
       - name: Run Containers
         run: docker compose up -d --build
 
+      - name: Wait for API container to be healthy
+        run: docker compose wait bank_app
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -32,4 +34,3 @@ jobs:
 
       - name: Run Pytests
         run: pytest e2e_tests.py
-      

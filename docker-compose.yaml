@@ -20,6 +20,13 @@ services:
       - postgres18
     ports:
       - "8000:8000"
-
+    environment:
+      URL: postgresql://admin:1234@postgres18:5432/bank_app_core
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 5s
+      retries: 20
+      start_period: 5s
+      timeout: 2s
 volumes:
   postgres18_data:
