@@ -40,3 +40,5 @@ jobs:
 
       - name: Run Pytests
         run: pytest e2e_tests.py
+        env:
+          URL: ${{ secrets.URL }}
