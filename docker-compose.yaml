@@ -4,9 +4,9 @@ services:
     container_name: postgres18
     restart: always
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: "1234"
-      POSTGRES_DB: bank_app_core
+      POSTGRES_USER: ${USER} 
+      POSTGRES_PASSWORD: ${PASSWORD} 
+      POSTGRES_DB: ${DB} 
     ports:
       - "5433:5432"
     volumes:
@@ -21,7 +21,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      URL: postgresql://admin:1234@postgres18:5432/bank_app_core
+      URL: ${URL}                                                                                             
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 5s

@@ -16,10 +16,10 @@ WORKDIR /app
 
 
 # 6. Instalacja zależności Pythona
-RUN pip install --no-cache-dir fastapi uvicorn[standard] sqlalchemy nanoid psycopg2-binary
-
-# 7. Kopiowanie aplikacji
 COPY . .
+RUN pip install --no-cache-dir .
+
+
 
 # 8. Uruchamianie FastAPI przez Uvicorn
 CMD ["uvicorn", "api:api", "--host", "0.0.0.0", "--port", "8000"]

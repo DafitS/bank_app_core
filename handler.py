@@ -6,6 +6,9 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from orm import Accounts, Users, Transactions
 from utils import generate_unique_account_number
+from passlib.context import CryptContext
+
+
 
 
 class BankAppHandler:
@@ -77,6 +80,7 @@ class BankAppHandler:
 
     def create_user(self, email):
         with self.get_session() as session:
+          
             user = Users(email=email)
             session.add(user)
             session.flush() 
@@ -136,11 +140,7 @@ class BankAppHandler:
 
 
     def update_user(self, user_id, new_email):
-        EMAIL_REGEX = re.compile(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)")
-
-        if not EMAIL_REGEX.match(new_email):
-            raise ex.ErrorConversionType("Invalid email format!")
-
+        
         with self.get_session() as session:
             user = session.query(Users).filter_by(user_id=user_id).one_or_none()
             if user is None:
@@ -196,3 +196,5 @@ class BankAppHandler:
                 "amount": amount
             }
 
+
+#pon 16 dodac secret, instal cicd z pytontml pyprojecttoml.

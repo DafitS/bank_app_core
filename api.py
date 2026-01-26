@@ -1,33 +1,15 @@
 import exceptions as ex
 from fastapi import FastAPI, HTTPException, Response
 from handler import BankAppHandler
-from pydantic import BaseModel
 from uuid import UUID
-from datetime import datetime
 from fastapi.responses import JSONResponse
+from validations_models import CreateUser, CreateTransaction, CreateAccount, UpdateAccount, UpdateUser
+
 
 api = FastAPI()
 bank = BankAppHandler()
 
-class CreateUser(BaseModel):
-    email: str
 
-class UpdateUser(BaseModel):
-    user_id: str
-    new_email: str
-
-class CreateTransaction(BaseModel):
-    account_from: str
-    account_to: str
-    amount: float
-    date: datetime
-
-class UpdateAccount(BaseModel):
-     number: str
-     new_amount: float
-
-class CreateAccount(BaseModel):
-    user_id: str
 
 @api.get("/users")
 def list_users():
@@ -81,9 +63,6 @@ def delete_account(number: str):
     except Exception:
         raise HTTPException(status_code=500, detail="Internal server error")
 
-class UpdateAccount(BaseModel):
-    number: str
-    new_amount: float
 
 @api.put("/account")
 def update_account(body: UpdateAccount):
