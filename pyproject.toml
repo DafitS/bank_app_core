@@ -17,6 +17,7 @@ dependencies = [
     "requests==2.32.5",
     "passlib",
     "pydantic[email]"
+
 ]
 
 
