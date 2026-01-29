@@ -19,8 +19,14 @@ jobs:
       - name: Run Containers
         run: docker compose up -d --build
 
-      - name: Wait for API container to be healthy
-        run: docker compose wait bank_app
+      - name: Wait for API
+        run: |
+          for i in {1..15}; do
+            curl -f http://127.0.0.1:8000/health && exit 0
+            sleep 2
+          done
+          docker compose logs
+          exit 1
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -34,3 +40,5 @@ jobs:
 
       - name: Run Pytests
         run: pytest e2e_tests.py
+        env:
+          URL: ${{ secrets.URL }}
