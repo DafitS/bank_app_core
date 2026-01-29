@@ -1,23 +1,27 @@
 from contextlib import contextmanager
-import re, os
+import os
 import exceptions as ex
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from orm import Accounts, Users, Transactions
-from utils import generate_unique_account_number
-from passlib.context import CryptContext
+from utils import generate_unique_account_number, pwd_context
+from datetime import datetime
 
-
+from validations_models import (
+    CreateUser as CreateUserValidator,
+    CreateAccount as CreateAccountValidator,
+    UpdateUser as UpdateUserValidator,
+    UpdateAccount as UpdateAccountValidator,
+    CreateTransaction as CreateTransactionValidator
+)
 
 
 class BankAppHandler:
     def __init__(self):
         value = os.getenv("URL")
         self.engine = create_engine(value)
-
         self.session = sessionmaker(bind=self.engine, expire_on_commit=False)
-
 
     @contextmanager
     def get_session(self):
@@ -38,24 +42,21 @@ class BankAppHandler:
             session.close()
 
     def create_account(self, user_id):
+        data = CreateAccountValidator(user_id=user_id)
         with self.get_session() as session:
-            user = session.query(Users).filter_by(user_id=user_id).one_or_none()
+            user = session.query(Users).filter_by(user_id=data.user_id).one_or_none()
             if user is None:
                 raise ex.NotFoundError("User does not exist")
-
             account_number = generate_unique_account_number()
-            account = Accounts(
-                account_number=account_number,
-                user_id=user_id
-            )
+            account = Accounts(account_number=account_number, user_id=data.user_id)
             session.add(account)
             session.flush()
             return {
                 "account_id": account.account_id,
                 "account_number": account.account_number,
-                "user_id": user_id, "amount": account.amount
-                }
-
+                "user_id": data.user_id,
+                "amount": account.amount
+            }
 
     def get_accounts(self):
         with self.get_session() as session:
@@ -66,10 +67,8 @@ class BankAppHandler:
                     "account_number": acc.account_number,
                     "amount": acc.amount,
                     "user_id": acc.user_id
-                }
-                for acc in accounts
+                } for acc in accounts
             ]
-
 
     def delete_account(self, number):
         with self.get_session() as session:
@@ -78,20 +77,17 @@ class BankAppHandler:
                 raise ex.NotFoundError(f"Account {number} not found")
             session.delete(account)
 
-    def create_user(self, email):
+    def create_user(self, email, password):
+        user_data = CreateUserValidator(email=email, password=password)
+        hashed_password = pwd_context.hash(user_data.password)
         with self.get_session() as session:
-          
-            user = Users(email=email)
+            user = Users(email=user_data.email, password=hashed_password)
             session.add(user)
-            session.flush() 
-            new_account_number = generate_unique_account_number()
-            account = Accounts(
-                account_number=new_account_number,
-                user_id = user.user_id
-            )
+            session.flush()
+            account_number = generate_unique_account_number()
+            account = Accounts(account_number=account_number, user_id=user.user_id)
             session.add(account)
             session.flush()
-
             return {
                 "id": user.user_id,
                 "email": user.email,
@@ -101,15 +97,14 @@ class BankAppHandler:
     def get_users(self):
         with self.get_session() as session:
             users = session.query(Users).all()
-            result = []
-            for u in users:
-                result.append({
+            return [
+                {
                     "id": u.user_id,
                     "email": u.email,
                     "account_id": u.accounts[0].account_id if u.accounts else None
-                })
-            return result 
-        
+                } for u in users
+            ]
+
     def delete_user(self, user_id):
         with self.get_session() as session:
             user = session.query(Users).filter_by(user_id=user_id).one_or_none()
@@ -118,19 +113,13 @@ class BankAppHandler:
             session.delete(user)
 
     def update_account(self, number, new_amount):
-        if not isinstance(new_amount, (int, float)):
-            raise ex.ErrorConversionType("Amount must be a number!")
-        if new_amount < 0:
-            raise ex.AmountTooSmallError("Amount must be greater than 0!")
-
+        data = UpdateAccountValidator(number=number, new_amount=new_amount)
         with self.get_session() as session:
-            account = session.query(Accounts).filter_by(account_number=number).first()
+            account = session.query(Accounts).filter_by(account_number=data.number).one_or_none()
             if account is None:
-                raise ex.NotFoundError(f"Account {number} not found")
-
-            account.amount = new_amount
+                raise ex.NotFoundError(f"Account {data.number} not found")
+            account.amount = data.new_amount
             session.flush()
-
             return {
                 "account_id": account.account_id,
                 "account_number": account.account_number,
@@ -138,63 +127,47 @@ class BankAppHandler:
                 "user_id": account.user_id
             }
 
-
     def update_user(self, user_id, new_email):
-        
+        data = UpdateUserValidator(user_id=user_id, new_email=new_email)
         with self.get_session() as session:
-            user = session.query(Users).filter_by(user_id=user_id).one_or_none()
+            user = session.query(Users).filter_by(user_id=data.user_id).one_or_none()
             if user is None:
-                raise ex.NotFoundError(f"User {user_id} not found")
-
-            existing_email = session.query(Users).filter_by(email=new_email).one_or_none()
-            if existing_email and existing_email.user_id != user_id:
+                raise ex.NotFoundError(f"User {data.user_id} not found")
+            existing_email = session.query(Users).filter_by(email=data.new_email).one_or_none()
+            if existing_email and existing_email.user_id != data.user_id:
                 raise ex.DuplictedError("Email already in use!")
-
-            user.email = new_email
+            user.email = data.new_email
             session.flush()
+            return {"id": user.user_id, "email": user.email}
 
-            return {
-                "id": user.user_id,
-                "email": user.email
-            }
-
-        
     def create_transaction(self, account_from_id, account_to_id, amount):
-        if account_from_id == account_to_id:
-            raise ex.ErrorConversionType("The same account number!")
-
-        if amount <= 0:
-            raise ex.AmountTooSmallError("Amount must be greater than 0!")
-
+        data = CreateTransactionValidator(
+            account_from=account_from_id,
+            account_to=account_to_id,
+            amount=amount,
+            date=datetime.now()
+        )
         with self.get_session() as session:
-            account_from = session.query(Accounts).filter_by(account_id=account_from_id).one_or_none()
-            if account_from is None:
-                raise ex.NotFoundError(f"Account {account_from_id} not exist!")
-
-            account_to = session.query(Accounts).filter_by(account_id=account_to_id).one_or_none()
-            if account_to is None:
-                raise ex.NotFoundError(f"Account {account_to_id} not exist!")
-
-            if account_from.amount < amount:
+            acc_from = session.query(Accounts).filter_by(account_id=data.account_from).one_or_none()
+            acc_to = session.query(Accounts).filter_by(account_id=data.account_to).one_or_none()
+            if not acc_from:
+                raise ex.NotFoundError(f"Account {data.account_from} not exist!")
+            if not acc_to:
+                raise ex.NotFoundError(f"Account {data.account_to} not exist!")
+            if acc_from.amount < data.amount:
                 raise ex.AmountTooSmallError("Too little deposit in account!")
-
-            account_from.amount -= amount
-            account_to.amount += amount
-
+            acc_from.amount -= data.amount
+            acc_to.amount += data.amount
             transaction = Transactions(
-                account_id_from=account_from_id,
-                account_id_to=account_to_id,
-                amount=amount
+                account_id_from=data.account_from,
+                account_id_to=data.account_to,
+                amount=data.amount
             )
-
             session.add(transaction)
             session.flush()
             return {
                 "transaction_id": transaction.transaction_id,
-                "account_from_id": account_from_id,
-                "account_to_id": account_to_id,
-                "amount": amount
+                "account_from_id": data.account_from,
+                "account_to_id": data.account_to,
+                "amount": data.amount
             }
-
-
-#pon 16 dodac secret, instal cicd z pytontml pyprojecttoml.
