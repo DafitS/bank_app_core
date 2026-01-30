@@ -54,3 +54,7 @@ class UpdateAccount(BaseModel):
         if value <= 0:
             raise ValueError("Amount must be greater than 0!")
         return value
+
+class LoginUser(BaseModel):
+    email: str
+    password: str

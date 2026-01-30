@@ -3,7 +3,7 @@ from fastapi import FastAPI, HTTPException, Response
 from handler import BankAppHandler
 from uuid import UUID
 from fastapi.responses import JSONResponse
-from validations_models import CreateUser, CreateTransaction, CreateAccount, UpdateAccount, UpdateUser
+from validations_models import CreateUser, CreateTransaction, CreateAccount, UpdateAccount, UpdateUser, LoginUser
 
 
 api = FastAPI()
@@ -25,7 +25,7 @@ def delete_user(user_id: UUID):
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal error!")
          
-@api.post("/user")
+@api.post("/register")
 def create_user(body: CreateUser):
     return bank.create_user(**body.model_dump())
 
@@ -75,6 +75,19 @@ def update_account(body: UpdateAccount):
     except Exception:
         raise HTTPException(status_code=500, detail="Internal server error")
     
+
+@api.post("/login")
+def login_user(body: LoginUser):
+    try:
+        user =  bank.authenticate(**body.model_dump())
+    except ex.AuthenticationException:
+        raise HTTPException(status_code=401, detail="UNATHORIZED!") 
+
+    return bank.create_access_token(data={"sub": user.email}, expires_minutes=15)
+    
+        
+
+
 @api.get("/health")
 def health_check():
     return JSONResponse(content={"status": "ok"})

@@ -12,3 +12,6 @@ class AmountTooSmallError(Exception):
 
 class ErrorConversionType(Exception):
     pass
+
+class AuthenticationException(Exception):
+    pass

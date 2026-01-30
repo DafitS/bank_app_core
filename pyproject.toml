@@ -16,7 +16,8 @@ dependencies = [
     "nanoid==2.0.0",
     "requests==2.32.5",
     "passlib",
-    "pydantic[email]"
+    "pydantic[email]",
+    "python-jose"
 
 ]
 
