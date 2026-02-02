@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 
 from orm import Base
 
-value = os.getenv("URL")
+value = os.getenv("URL").strip()
 engine = create_engine(value)
 Session = sessionmaker(bind=engine)
 
