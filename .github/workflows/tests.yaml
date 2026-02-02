@@ -41,7 +41,8 @@ jobs:
       - name: Install test dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest sqlalchemy nanoid psycopg2-binary requests
+          pip install .
+          pip install pytest
 
       - name: Run Pytests
         run: pytest e2e_tests.py
