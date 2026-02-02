@@ -1,9 +1,19 @@
 import uuid
-from utils import generate_nanoid
-from sqlalchemy import Column, Float, Integer, Numeric, String, ForeignKey, BigInteger, DateTime, func, CheckConstraint
-from sqlalchemy.orm import declarative_base, relationship
-from sqlalchemy.dialects.postgresql import UUID
 
+from sqlalchemy import (
+    CheckConstraint,
+    Column,
+    DateTime,
+    Float,
+    ForeignKey,
+    Numeric,
+    String,
+    func,
+)
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import declarative_base, relationship
+
+from utils import generate_nanoid
 
 Base = declarative_base()
 
@@ -18,7 +28,6 @@ class Users(Base):
     accounts = relationship("Accounts", back_populates="user")
 
 
-    
 class Accounts(Base):
     __tablename__ = "accounts"
 
@@ -46,7 +55,8 @@ class Accounts(Base):
 
     transactions_from = relationship("Transactions", foreign_keys="Transactions.account_id_from", backref="from_account")
     transactions_to = relationship("Transactions", foreign_keys="Transactions.account_id_to", backref="to_account")
-    
+
+
 class Transactions(Base):
     __tablename__ = "transactions"
 
@@ -67,17 +77,13 @@ class Transactions(Base):
         nullable=False
 )
 
-
     date = Column(DateTime,
-         default=func.now(), 
+         default=func.now(),
          nullable=False)
-    
+
     amount = Column(Float,
-         nullable=False) 
+         nullable=False)
 
     __table_args__ = (
-        CheckConstraint("amount > 0", name = "invalid_range_value_amount"),
+        CheckConstraint("amount > 0", name="invalid_range_value_amount"),
     )
-
-
-

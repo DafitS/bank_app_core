@@ -1,16 +1,19 @@
-from contextlib import contextmanager
 import os
-import exceptions as ex
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.exc import IntegrityError, NoResultFound
-from orm import Accounts, Users, Transactions
-from utils import generate_unique_account_number, pwd_context
-from datetime import datetime, timedelta, timezone
+from contextlib import contextmanager
+from datetime import UTC, datetime, timedelta
+
 from jose import jwt
+from sqlalchemy import create_engine
+from sqlalchemy.exc import IntegrityError, NoResultFound
+from sqlalchemy.orm import sessionmaker
+
+import exceptions as ex
+from orm import Accounts, Transactions, Users
+from utils import generate_unique_account_number, pwd_context
 
 SECRET_KEY = "super-secret-key"  # trzymaj w env!
 ALGORITHM = "HS256"
+
 
 class BankAppHandler:
     def __init__(self):
@@ -168,10 +171,8 @@ class BankAppHandler:
 
     def create_access_token(self, data: dict, expires_minutes: int = 15):
         to_encode = data
-        expire = datetime.now(timezone.utc) + timedelta(minutes=expires_minutes)
+        expire = datetime.now(UTC) + timedelta(minutes=expires_minutes)
         to_encode.update({"exp": expire})
 
         token = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
         return token
-  
-   

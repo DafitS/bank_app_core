@@ -1,7 +1,9 @@
 import string
-from pydantic import BaseModel, Field, EmailStr, field_validator, model_validator
 from datetime import datetime
 from uuid import UUID
+
+from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
+
 
 class CreateUser(BaseModel):
     email: EmailStr
@@ -42,7 +44,6 @@ class CreateTransaction(BaseModel):
         if model.account_from == model.account_to:
             raise ValueError("Accounts must be different!")
         return model
-    
 
 
 class UpdateAccount(BaseModel):
@@ -54,6 +55,7 @@ class UpdateAccount(BaseModel):
         if value <= 0:
             raise ValueError("Amount must be greater than 0!")
         return value
+
 
 class LoginUser(BaseModel):
     email: str

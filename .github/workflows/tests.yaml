@@ -18,10 +18,15 @@ jobs:
 
       - name: Run Containers
         run: docker compose up -d --build
+        env:
+          USER: ${{ secrets.USER }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+          DB: ${{ secrets.DB }}
+          URL: ${{ secrets.URL }}
 
       - name: Wait for API
         run: |
-          for i in {1..15}; do
+          for i in {1..20}; do
             curl -f http://127.0.0.1:8000/health && exit 0
             sleep 2
           done

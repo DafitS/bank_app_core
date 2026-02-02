@@ -26,3 +26,36 @@ dependencies = [
 dev = [
     "pytest==9.0.2",
 ]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 88
+fix = true
+unsafe-fixes = false
+preview = true
+show-fixes = true
+respect-gitignore = true
+
+# 🔎 MAKSYMALNA DOKŁADNOŚĆ – co sprawdzamy
+select = [
+  # 🧨 TWARDY BŁĄD – kod się wywali
+  "F",     # pyflakes (unused imports, undefined names)
+  "E", "W",# pycodestyle
+  "B",     # bugbear (subtelne bugi)
+  "C4",    # niepotrzebne list/dict comprehension
+  "SIM",   # uproszczenia logiki
+  "RET",   # błędy w returnach
+  "ARG",   # nieużywane argumenty
+  "TCH",   # type-checking blocks
+  "RUF",   # reguły Ruffa
+
+  # 🧠 JAKOŚĆ / UTRZYMANIE
+  "UP",    # pyupgrade
+  "I",     # isort
+  "PL",    # pylint (część sensownych reguł)
+  "PERF",  # performance anty-wzorce
+  "DTZ",   # datetime timezone bugs
+
+  # 🔐 BEZPIECZEŃSTWO
+  "S",     # bandit (security issues)
+]
