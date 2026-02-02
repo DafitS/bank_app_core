@@ -170,9 +170,8 @@ class BankAppHandler:
             return user
 
     def create_access_token(self, data: dict, expires_minutes: int = 15):
-        to_encode = data
+        to_encode = data.copy()
         expire = datetime.now(UTC) + timedelta(minutes=expires_minutes)
         to_encode.update({"exp": expire})
+        return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
-        token = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-        return token

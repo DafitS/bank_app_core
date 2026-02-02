@@ -17,10 +17,15 @@ ALGORITHM = "HS256"
 
 def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
     token = credentials.credentials
-    token_decoded = jwt.decode(token, SECRET_KEY, ALGORITHM)
-    user_email = token_decoded.get("sub")
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+
+    user_email = payload.get("sub")
     if user_email is None:
-        raise HTTPException(status_code=401, message = "Invalid Token!")
+        raise HTTPException(status_code=401, detail="Invalid token payload")
+
     return user_email
 
 
