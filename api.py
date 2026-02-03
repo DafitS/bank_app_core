@@ -51,7 +51,12 @@ def delete_user(user_id: UUID):
          
 @api.post("/register")
 def create_user(body: CreateUser):
-    return bank.create_user(**body.model_dump())
+    try:
+        return bank.create_user(**body.model_dump())
+    except Exception as e:
+        print("REGISTER ERROR:", type(e), e)
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @api.put("/user")
 def update_user(body: UpdateUser):
