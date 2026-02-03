@@ -1,5 +1,4 @@
 import os
-
 import pytest
 import requests
 from sqlalchemy import create_engine
@@ -40,7 +39,7 @@ def test_list_users():
     assert response.status_code == 200
 
     users = response.json()
-    assert any(u["email"] == "test22@local.com" for u in users)
+    assert any(u["email"] == "test22@local.cm" for u in users)
 
 
 def test_create_account():
