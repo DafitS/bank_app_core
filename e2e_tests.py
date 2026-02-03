@@ -25,7 +25,7 @@ def test_create_user():
         "email": "test@local.cm",
         "password": "Aa123456!"
     }
-    response = requests.post("http://127.0.0.1:8000/user", json=payload)
+    response = requests.post("http://127.0.0.1:8000/register", json=payload)
     assert response.status_code in [200, 201, 204]
 
 
@@ -34,7 +34,7 @@ def test_list_users():
         "email": "test22@local.cm",
         "password": "Aa123456!"
     }
-    requests.post("http://127.0.0.1:8000/user", json=payload)
+    requests.post("http://127.0.0.1:8000/register", json=payload)
 
     response = requests.get("http://127.0.0.1:8000/users")
     assert response.status_code == 200
@@ -48,7 +48,7 @@ def test_create_account():
         "email": "test33@local.cm",
         "password": "Aa123456!"
     }
-    requests.post("http://127.0.0.1:8000/user", json=payload)
+    requests.post("http://127.0.0.1:8000/register", json=payload)
 
     users = requests.get("http://127.0.0.1:8000/users").json()
     user_id = users[-1]["id"]
