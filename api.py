@@ -6,7 +6,6 @@ from fastapi.responses import JSONResponse
 from validations_models import CreateUser, CreateTransaction, CreateAccount, UpdateAccount, UpdateUser, LoginUser
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt, JWTError
 from datetime import timezone
 
@@ -39,8 +38,8 @@ bank = BankAppHandler()
 def list_users(user_email: str = Depends(get_current_user)):
     return bank.get_users()
 
-@api.delete("/user/{user_id}")
-def delete_user(user_id: UUID):
+@api.delete(("/user/{user_id}"))
+def delete_user(user_id: UUID, user_email: str = Depends(get_current_user)):
     try:        
         bank.delete_user(str(user_id))
         return Response(status_code=200)
@@ -59,7 +58,7 @@ def create_user(body: CreateUser):
 
 
 @api.put("/user")
-def update_user(body: UpdateUser):
+def update_user(body: UpdateUser, user_email: str = Depends(get_current_user)):
     return bank.update_user(**body.model_dump())
 
 @api.post("/account")
@@ -67,7 +66,7 @@ def create_account(body: CreateAccount, user_email: str = Depends(get_current_us
     return bank.create_account(**body.model_dump())
 
 @api.post("/transaction")
-def create_transaction(body: CreateTransaction):
+def create_transaction(body: CreateTransaction, user_email: str = Depends(get_current_user)):
     try:
         bank.create_transaction(**body.model_dump())
         return Response(status_code=200)
@@ -79,11 +78,11 @@ def create_transaction(body: CreateTransaction):
         raise HTTPException(status_code=500, detail="Internal error!")
     
 @api.get("/accounts")
-def list_accounts():
+def list_accounts(user_email: str = Depends(get_current_user)):
     return bank.get_accounts()
 
 @api.delete("/account/{number}")
-def delete_account(number: str):
+def delete_account(number: str, user_email: str = Depends(get_current_user)):
     try:
         bank.delete_account(number)
         return Response(status_code=200)
@@ -94,7 +93,7 @@ def delete_account(number: str):
 
 
 @api.put("/account")
-def update_account(body: UpdateAccount):
+def update_account(body: UpdateAccount, user_email: str = Depends(get_current_user)):
     try:
         return bank.update_account(**body.model_dump())
     except ex.NotFoundError as e:
@@ -110,7 +109,7 @@ def login_user(body: LoginUser):
     try:
         user =  bank.authenticate(**body.model_dump())
     except ex.AuthenticationException:
-        raise HTTPException(status_code=401, detail="UNATHORIZED!") 
+        raise HTTPException(status_code=401, detail="UNAUTHORIZED!") 
 
     return bank.create_access_token(data={"sub": user.email}, expires_minutes=15)
     

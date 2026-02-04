@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 
 from orm import Base
 
-value = os.getenv("URL").strip()
+value = os.getenv("URLFORTEST").strip()
 engine = create_engine(value)
 Session = sessionmaker(bind=engine)
 

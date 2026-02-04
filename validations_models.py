@@ -34,16 +34,16 @@ class UpdateUser(BaseModel):
 
 
 class CreateTransaction(BaseModel):
-    account_from: str
-    account_to: str
+    account_from_id: str
+    account_to_id: str
     amount: float = Field(..., gt=0)
-    date: datetime
 
     @model_validator(mode="after")
     def validate_accounts(cls, model):
-        if model.account_from == model.account_to:
+        if model.account_from_id == model.account_to_id:
             raise ValueError("Accounts must be different!")
         return model
+
 
 
 class UpdateAccount(BaseModel):
