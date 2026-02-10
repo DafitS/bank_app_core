@@ -1,4 +1,5 @@
 import os
+
 import pytest
 import requests
 from sqlalchemy import create_engine
@@ -26,5 +27,3 @@ def test_create_user():
     }
     response = requests.post("http://127.0.0.1:8000/register", json=payload)
     assert response.status_code in [200, 201, 204]
-
-

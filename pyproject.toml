@@ -36,7 +36,7 @@ preview = true
 show-fixes = true
 respect-gitignore = true
 
-# 🔎 MAKSYMALNA DOKŁADNOŚĆ – co sprawdzamy
+[tool.ruff.lint]
 select = [
   # 🧨 TWARDY BŁĄD – kod się wywali
   "F",     # pyflakes (unused imports, undefined names)

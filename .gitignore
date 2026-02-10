@@ -47,3 +47,5 @@ instance/
 
 # --- Misc ---
 *.DS_Store
+
+set_db.ps1
