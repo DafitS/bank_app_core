@@ -19,71 +19,124 @@ Base = declarative_base()
 
 
 class Users(Base):
+    """User ORM model."""
+
     __tablename__ = "users"
 
-    user_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    email = Column(String(120), unique=True, nullable=False)
-    password = Column(String(120), nullable=False)
+    user_id = Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+    )
+    email = Column(
+        String(120),
+        unique=True,
+        nullable=False,
+    )
+    password = Column(
+        String(120),
+        nullable=False,
+    )
 
-    accounts = relationship("Accounts", back_populates="user")
+    accounts = relationship(
+        "Accounts",
+        back_populates="user",
+    )
 
 
 class Accounts(Base):
+    """Bank account ORM model."""
+
     __tablename__ = "accounts"
 
     account_id = Column(
         String(12),
         primary_key=True,
-        default=generate_nanoid
+        default=generate_nanoid,
     )
 
     account_number = Column(
         Numeric(26, 0),
         unique=True,
-        nullable=False
+        nullable=False,
     )
 
     user_id = Column(
         UUID(as_uuid=True),
-        ForeignKey("users.user_id", ondelete="RESTRICT"),
-        nullable=False
+        ForeignKey(
+            "users.user_id",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
     )
 
-    amount = Column(Float, default=0.0)
+    amount = Column(
+        Float,
+        default=0.0,
+        nullable=False,
+    )
 
-    user = relationship("Users", back_populates="accounts")
+    user = relationship(
+        "Users",
+        back_populates="accounts",
+    )
 
-    transactions_from = relationship("Transactions", foreign_keys="Transactions.account_id_from", backref="from_account")
-    transactions_to = relationship("Transactions", foreign_keys="Transactions.account_id_to", backref="to_account")
+    transactions_from = relationship(
+        "Transactions",
+        foreign_keys="Transactions.account_id_from",
+        backref="from_account",
+    )
+
+    transactions_to = relationship(
+        "Transactions",
+        foreign_keys="Transactions.account_id_to",
+        backref="to_account",
+    )
 
 
 class Transactions(Base):
+    """Transaction ORM model."""
+
     __tablename__ = "transactions"
 
     transaction_id = Column(
         UUID(as_uuid=True),
         primary_key=True,
-        default=uuid.uuid4
+        default=uuid.uuid4,
     )
+
     account_id_from = Column(
-    String(12),
-    ForeignKey("accounts.account_id", ondelete="CASCADE"),
-    nullable=False
-)
+        String(12),
+        ForeignKey(
+            "accounts.account_id",
+            ondelete="CASCADE",
+        ),
+        nullable=False,
+    )
 
     account_id_to = Column(
         String(12),
-        ForeignKey("accounts.account_id", ondelete="CASCADE"),
-        nullable=False
-)
+        ForeignKey(
+            "accounts.account_id",
+            ondelete="CASCADE",
+        ),
+        nullable=False,
+    )
 
-    date = Column(DateTime,
-         default=func.now(),
-         nullable=False)
+    date = Column(
+        DateTime,
+        default=func.now(),
+        nullable=False,
+    )
 
-    amount = Column(Float,
-         nullable=False)
+    amount = Column(
+        Float,
+        nullable=False,
+    )
 
     __table_args__ = (
-        CheckConstraint("amount > 0", name="invalid_range_value_amount"),
+        CheckConstraint(
+            "amount > 0",
+            name="invalid_range_value_amount",
+        ),
     )
