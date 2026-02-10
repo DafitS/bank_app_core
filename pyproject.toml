@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bank-app"
+version = "0.1.0"
+description = "FastAPI bank app"
+requires-python = ">=3.12"
+
+dependencies = [
+    "fastapi==0.128.0",
+    "uvicorn[standard]==0.40.0",
+    "SQLAlchemy==2.0.45",
+    "psycopg2-binary==2.9.11",
+    "nanoid==2.0.0",
+    "requests==2.32.5",
+    "passlib",
+    "pydantic[email]",
+    "python-jose"
+
+]
+
+
+[project.optional-dependencies]
+dev = [
+    "pytest==9.0.2",
+]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 88
+fix = true
+unsafe-fixes = false
+preview = true
+show-fixes = true
+respect-gitignore = true
+
+[tool.ruff.lint]
+select = [
+  # 🧨 TWARDY BŁĄD – kod się wywali
+  "F",     # pyflakes (unused imports, undefined names)
+  "E", "W",# pycodestyle
+  "B",     # bugbear (subtelne bugi)
+  "C4",    # niepotrzebne list/dict comprehension
+  "SIM",   # uproszczenia logiki
+  "RET",   # błędy w returnach
+  "ARG",   # nieużywane argumenty
+  "TCH",   # type-checking blocks
+  "RUF",   # reguły Ruffa
+
+  # 🧠 JAKOŚĆ / UTRZYMANIE
+  "UP",    # pyupgrade
+  "I",     # isort
+  "PL",    # pylint (część sensownych reguł)
+  "PERF",  # performance anty-wzorce
+  "DTZ",   # datetime timezone bugs
+
+  # 🔐 BEZPIECZEŃSTWO
+  "S",     # bandit (security issues)
+]

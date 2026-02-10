@@ -1,0 +1,32 @@
+services:
+  postgres18:
+    image: postgres:18.1
+    container_name: postgres18
+    restart: always
+    environment:
+      POSTGRES_USER: ${USER} 
+      POSTGRES_PASSWORD: ${PASSWORD} 
+      POSTGRES_DB: ${DB} 
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres18_data:/var/lib/postgresql
+
+  bank_app:
+    build: .
+    container_name: bank_app
+    restart: always
+    depends_on:
+      - postgres18
+    ports:
+      - "8000:8000"
+    environment:
+      URL: ${URL}                                                                                             
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 5s
+      retries: 20
+      start_period: 5s
+      timeout: 2s
+volumes:
+  postgres18_data:
