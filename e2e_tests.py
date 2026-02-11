@@ -3,9 +3,9 @@ import pytest
 import requests
 import time
 
-API_URL = os.getenv("URLFORTEST")
+API_URL = os.getenv("API_URL", "http://127.0.0.1:8000")
 if not API_URL:
-    raise RuntimeError("URLFORTEST is not set!")
+    raise RuntimeError("API_URL is not set! Sprawdź secrets w GitHub Actions.")
 
 API_URL = API_URL.strip()
 
