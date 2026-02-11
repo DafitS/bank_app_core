@@ -18,15 +18,17 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v3
 
+      - name: Create .env file
+        run: |
+          echo "USER=${{ secrets.USER }}" >> .env
+          echo "PASSWORD=${{ secrets.PASSWORD }}" >> .env
+          echo "DB=${{ secrets.DB }}" >> .env
+          echo "URL=${{ secrets.URL }}" >> .env
+          echo "URLFORTEST=${{ secrets.URLFORTEST }}" >> .env
+          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
+
       - name: Run Containers
         run: docker compose up -d --build
-        env:
-          USER: ${{ secrets.USER }}
-          PASSWORD: ${{ secrets.PASSWORD }}
-          DB: ${{ secrets.DB }}
-          URL: ${{ secrets.URL }}
-          URLFORTEST: ${{ secrets.URLFORTEST }}
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
       - name: Debug env vars
         run: |
