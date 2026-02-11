@@ -28,13 +28,23 @@ jobs:
           URLFORTEST: ${{ secrets.URLFORTEST }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
+      - name: Debug env vars
+        run: |
+          echo "URL=$URL"
+          echo "URLFORTEST=$URLFORTEST"
+          echo "USER=$USER"
+          echo "PASSWORD=$PASSWORD"
+          echo "DB=$DB"
+
       - name: Wait for API
         run: |
           for i in {1..20}; do
             curl -f http://127.0.0.1:8000/health && exit 0
             sleep 2
           done
-          docker compose logs
+          echo "API nie wstało — logi kontenerów:"
+          docker compose logs bank_app
+          docker compose logs postgres18
           exit 1
 
       - name: Set up Python
@@ -52,3 +62,7 @@ jobs:
         run: pytest e2e_tests.py
         env:
           API_URL: http://127.0.0.1:8000
+
+      - name: Show backend logs on failure
+        if: failure()
+        run: docker compose logs bank_app
