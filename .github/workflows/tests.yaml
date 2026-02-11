@@ -51,3 +51,4 @@ jobs:
         run: pytest e2e_tests.py
         env:
           URL: ${{ secrets.URL }}
+          URLFORTEST: ${{ secrets.URLFORTEST }}
