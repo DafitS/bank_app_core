@@ -1,29 +1,36 @@
 import os
-
 import pytest
 import requests
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+import time
 
-from orm import Base
+API_URL = os.getenv("URLFORTEST")
+if not API_URL:
+    raise RuntimeError("URLFORTEST is not set!")
 
-value = os.getenv("URLFORTEST").strip()
-engine = create_engine(value)
-Session = sessionmaker(bind=engine)
+API_URL = API_URL.strip()
 
 
 @pytest.fixture(scope="session", autouse=True)
-def setup_database():
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-    yield
-    Base.metadata.drop_all(bind=engine)
+def wait_for_api():
+    """Czeka, aż API będzie dostępne przed uruchomieniem testów."""
+    for i in range(20):
+        try:
+            response = requests.get(f"{API_URL}/health")
+            if response.status_code == 200:
+                print("API jest gotowe!")
+                return
+        except requests.exceptions.ConnectionError:
+            pass
+        print(f"Czekam na API... ({i+1}/20)")
+        time.sleep(2)
+    pytest.fail("API nie wystartowało w ciągu 40 sekund")
 
 
 def test_create_user():
+    """Testuje endpoint rejestracji użytkownika."""
     payload = {
         "email": "test6@local.com",
         "password": "AAa123456!#"
     }
-    response = requests.post("http://127.0.0.1:8000/register", json=payload)
+    response = requests.post(f"{API_URL}/register", json=payload)
     assert response.status_code in [200, 201, 204]
