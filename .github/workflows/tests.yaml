@@ -26,6 +26,7 @@ jobs:
           DB: ${{ secrets.DB }}
           URL: ${{ secrets.URL }}
           URLFORTEST: ${{ secrets.URLFORTEST }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
       - name: Wait for API
         run: |
           for i in {1..20}; do
