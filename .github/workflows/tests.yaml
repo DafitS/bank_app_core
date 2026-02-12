@@ -9,13 +9,13 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:  # <-- tutaj ustawiamy wszystkie sekrety globalnie
+    env:
       USER: ${{ secrets.USER }}
       PASSWORD: ${{ secrets.PASSWORD }}
       DB: ${{ secrets.DB }}
-      URL: ${{ secrets.URL }}
-      URLFORTEST: ${{ secrets.URLFORTEST }}
+      URL: ${{ secrets.URL }}            
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      API_URL: "http://127.0.0.1:8000"
 
     steps:
       - name: Checkout repo
@@ -30,19 +30,10 @@ jobs:
           echo "PASSWORD=$PASSWORD" >> .env
           echo "DB=$DB" >> .env
           echo "URL=$URL" >> .env
-          echo "URLFORTEST=$URLFORTEST" >> .env
           echo "SECRET_KEY=$SECRET_KEY" >> .env
 
       - name: Run Containers
         run: docker compose up -d --build
-
-      - name: Debug env vars
-        run: |
-          echo "URL=$URL"
-          echo "URLFORTEST=$URLFORTEST"
-          echo "USER=$USER"
-          echo "PASSWORD=$PASSWORD"
-          echo "DB=$DB"
 
       - name: Wait for API
         run: |
@@ -68,8 +59,6 @@ jobs:
 
       - name: Run Pytests
         run: pytest e2e_tests.py
-        env:
-          API_URL: http://127.0.0.1:8000
 
       - name: Show backend logs on failure
         if: failure()
