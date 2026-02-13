@@ -12,6 +12,7 @@ from jose import JWTError, jwt
 
 import exceptions as ex
 from handler import BankAppHandler
+from orm import Base
 from validations_models import (
     CreateAccount,
     CreateTransaction,
@@ -30,6 +31,11 @@ ALGORITHM: str = "HS256"
 security = HTTPBearer()
 api = FastAPI()
 bank = BankAppHandler()
+
+
+@api.on_event("startup")
+def create_tables_on_startup():
+    Base.metadata.create_all(bind=bank.engine)
 
 
 def get_current_user(

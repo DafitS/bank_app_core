@@ -3,13 +3,19 @@ name: API Integration Tests
 on:
   push:
     branches:
-      - main
-  pull_request:
+      - '**'
   workflow_dispatch:
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      USER: ${{ secrets.USER }}
+      PASSWORD: ${{ secrets.PASSWORD }}
+      DB: ${{ secrets.DB }}
+      URL: ${{ secrets.URL }}            
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      API_URL: "http://127.0.0.1:8000"
 
     steps:
       - name: Checkout repo
@@ -18,21 +24,26 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v3
 
+      - name: Create .env file
+        run: |
+          echo "USER=$USER" >> .env
+          echo "PASSWORD=$PASSWORD" >> .env
+          echo "DB=$DB" >> .env
+          echo "URL=$URL" >> .env
+          echo "SECRET_KEY=$SECRET_KEY" >> .env
+
       - name: Run Containers
         run: docker compose up -d --build
-        env:
-          USER: ${{ secrets.USER }}
-          PASSWORD: ${{ secrets.PASSWORD }}
-          DB: ${{ secrets.DB }}
-          URL: ${{ secrets.URL }}
-          URLFORTEST: ${{ secrets.URLFORTEST }}
+
       - name: Wait for API
         run: |
           for i in {1..20}; do
             curl -f http://127.0.0.1:8000/health && exit 0
             sleep 2
           done
-          docker compose logs
+          echo "API nie wstało — logi kontenerów:"
+          docker compose logs bank_app
+          docker compose logs postgres18
           exit 1
 
       - name: Set up Python
@@ -48,5 +59,7 @@ jobs:
 
       - name: Run Pytests
         run: pytest e2e_tests.py
-        env:
-          URL: ${{ secrets.URL }}
+
+      - name: Show backend logs on failure
+        if: failure()
+        run: docker compose logs bank_app

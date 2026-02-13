@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   postgres18:
     image: postgres:18.1
@@ -21,12 +23,14 @@ services:
     ports:
       - "8000:8000"
     environment:
-      URL: ${URL}                                                                                             
+      URL: ${URL}
+      SECRET_KEY: ${SECRET_KEY}                                                                                             
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 5s
       retries: 20
       start_period: 5s
       timeout: 2s
+
 volumes:
   postgres18_data:
