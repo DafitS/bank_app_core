@@ -1,7 +1,7 @@
 import os
 from typing import Annotated
 from uuid import UUID
-from orm import Base
+
 from fastapi import Depends, FastAPI, HTTPException, Response
 from fastapi.responses import JSONResponse
 from fastapi.security import (
@@ -12,6 +12,7 @@ from jose import JWTError, jwt
 
 import exceptions as ex
 from handler import BankAppHandler
+from orm import Base
 from validations_models import (
     CreateAccount,
     CreateTransaction,
@@ -31,9 +32,11 @@ security = HTTPBearer()
 api = FastAPI()
 bank = BankAppHandler()
 
+
 @api.on_event("startup")
 def create_tables_on_startup():
     Base.metadata.create_all(bind=bank.engine)
+
 
 def get_current_user(
     credentials: Annotated[

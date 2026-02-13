@@ -414,4 +414,3 @@ class BankAppHandler:
             SECRET_KEY,
             algorithm=ALGORITHM,
         )
- #piatek 7.00

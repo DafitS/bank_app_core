@@ -1,12 +1,14 @@
 import os
-import pytest
-import requests
 import time
 import uuid
+
+import pytest
+import requests
 
 API_URL = os.getenv("API_URL", "http://127.0.0.1:8000").strip()
 if not API_URL:
     raise RuntimeError("API_URL nie jest ustawione! Sprawdź secrets w GitHub Actions.")
+
 
 @pytest.fixture(scope="session", autouse=True)
 def wait_for_api():
@@ -19,9 +21,10 @@ def wait_for_api():
                 return
         except requests.exceptions.ConnectionError:
             pass
-        print(f"Czekam na API... ({i+1}/20)")
+        print(f"Czekam na API... ({i + 1}/20)")
         time.sleep(2)
     pytest.fail("API nie wystartowało w ciągu 40 sekund")
+
 
 def test_create_user():
     """Testuje endpoint rejestracji użytkownika z unikalnym emailem."""
