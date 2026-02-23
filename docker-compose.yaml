@@ -6,9 +6,9 @@ services:
     container_name: postgres18
     restart: always
     environment:
-      POSTGRES_USER: ${USER} 
-      POSTGRES_PASSWORD: ${PASSWORD} 
-      POSTGRES_DB: ${DB} 
+      POSTGRES_USER: ${USER}
+      POSTGRES_PASSWORD: ${PASSWORD}
+      POSTGRES_DB: ${DB}
     ports:
       - "5433:5432"
     volumes:
@@ -24,7 +24,7 @@ services:
       - "8000:8000"
     environment:
       URL: ${URL}
-      SECRET_KEY: ${SECRET_KEY}                                                                                             
+      SECRET_KEY: ${SECRET_KEY}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 5s

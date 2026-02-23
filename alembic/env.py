@@ -1,9 +1,11 @@
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config, pool
-
+from bank_app.infrastructure.orm.user import Users  # <- Twój model Users
+from bank_app.infrastructure.orm.account import Accounts
+from bank_app.infrastructure.orm.transaction import Transactions
 from alembic import context
-from orm import Base
+from bank_app.infrastructure.orm.base import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
