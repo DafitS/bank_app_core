@@ -20,7 +20,6 @@ class SqlAlchemyTransactionRepository(TransactionRepository):
         self.session.commit()
         self.session.refresh(orm)
 
-    # Zwracamy entity z danych, które znamy
         return Transaction(
             transaction_id=orm.transaction_id,
             account_number_from=transaction.account_number_from,

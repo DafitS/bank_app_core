@@ -1,3 +1,3 @@
-from .account_schemas import AccountResponse, CreateAccountRequest
+from .account_schemas import AccountResponse, CreateAccountRequest, DepositRequest
 from .user_schemas import UserResponse, CreateUserRequest
 from .transaction_schemas import TransactionResponse, CreateTransactionRequest

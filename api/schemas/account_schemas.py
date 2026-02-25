@@ -12,3 +12,6 @@ class AccountResponse(BaseModel):
 class CreateAccountRequest(BaseModel):
     user_id: UUID
     amount: float = Field(ge=0, default=0.0)
+
+class DepositRequest(BaseModel):
+    amount: float

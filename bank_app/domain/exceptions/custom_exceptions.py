@@ -1,22 +1,25 @@
-class NotFoundError(Exception):
+from .base import DomainError
+
+
+class NotFoundError(DomainError):
     pass
 
 
-class DuplictedError(Exception):
+class DuplicatedError(DomainError):
     pass
 
 
-class DatabaseError(Exception):
+class DatabaseError(DomainError):
     pass
 
 
-class AmountTooSmallError(Exception):
+class AmountTooSmallError(DomainError):
     pass
 
 
-class ErrorConversionType(Exception):
+class ErrorConversionType(DomainError):
     pass
 
 
-class AuthenticationException(Exception):
+class AuthenticationException(DomainError):
     pass

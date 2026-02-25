@@ -33,6 +33,7 @@ class AccountService:
         if not account:
             raise NotFoundError("Account not found")
         return account
+    
     def disable_account(self, number: str) -> None:
         account = self.account_repo.get_by_number(number)
 
@@ -40,3 +41,17 @@ class AccountService:
             raise NotFoundError("Account not found")
 
         self.account_repo.disable(account)
+
+    def deposit_account(self, number: str, amount: float):
+        account = self.account_repo.get_by_number(number)
+        if not account:
+            raise NotFoundError("Account not found")
+        if not account.active:
+            raise NotFoundError("Account not found")
+        if amount <= 0:
+            raise ValueError("Amount must be positive")
+        
+        account.amount += Decimal(str(amount))
+        updated_account = self.account_repo.update(account)
+        return updated_account
+        
