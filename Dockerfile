@@ -25,4 +25,4 @@ RUN pip install --no-cache-dir dist/bank_app-0.1.0-py3-none-any.whl
 COPY bank_app ./bank_app
 
 # Domyślne polecenie uruchomienia
-CMD ["uvicorn", "bank_app.api.main:api", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "api.main:api", "--host", "0.0.0.0", "--port", "8000"]

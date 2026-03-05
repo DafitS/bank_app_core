@@ -17,15 +17,18 @@ dependencies = [
     "requests==2.32.5",
     "passlib",
     "pydantic[email]",
-    "python-jose"
-
+    "python-jose",
+    "bcrypt < 4"
 ]
-
 
 [project.optional-dependencies]
 dev = [
     "pytest==9.0.2",
 ]
+
+# 🔴 TO JEST KLUCZOWA SEKCJA
+[tool.setuptools.packages.find]
+include = ["bank_app*"]
 
 [tool.ruff]
 target-version = "py311"
@@ -38,24 +41,19 @@ respect-gitignore = true
 
 [tool.ruff.lint]
 select = [
-  # 🧨 TWARDY BŁĄD – kod się wywali
-  "F",     # pyflakes (unused imports, undefined names)
-  "E", "W",# pycodestyle
-  "B",     # bugbear (subtelne bugi)
-  "C4",    # niepotrzebne list/dict comprehension
-  "SIM",   # uproszczenia logiki
-  "RET",   # błędy w returnach
-  "ARG",   # nieużywane argumenty
-  "TCH",   # type-checking blocks
-  "RUF",   # reguły Ruffa
-
-  # 🧠 JAKOŚĆ / UTRZYMANIE
-  "UP",    # pyupgrade
-  "I",     # isort
-  "PL",    # pylint (część sensownych reguł)
-  "PERF",  # performance anty-wzorce
-  "DTZ",   # datetime timezone bugs
-
-  # 🔐 BEZPIECZEŃSTWO
-  "S",     # bandit (security issues)
+  "F",
+  "E", "W",
+  "B",
+  "C4",
+  "SIM",
+  "RET",
+  "ARG",
+  "TCH",
+  "RUF",
+  "UP",
+  "I",
+  "PL",
+  "PERF",
+  "DTZ",
+  "S",
 ]
