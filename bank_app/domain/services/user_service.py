@@ -8,14 +8,17 @@ class UserService:
     def __init__(self, user_repo: UserRepository):
         self.user_repo = user_repo
 
-    def create_user(self, email: str, password: str) -> User:
+    def create_user(self, email: str, password: str, first_name: str = "", last_name: str = "") -> User:
     
         hashed = pwd_context.hash(password)
     
-        user = User(user_id=uuid4(), email=email, password=hashed)
+        user = User(user_id=uuid4(), email=email, first_name=first_name, last_name=last_name)
 
-        return self.user_repo.create(user)
+        return self.user_repo.create(user, hashed)
 
     def get_users(self):
         return self.user_repo.list_all()
+    
+    def get_user_by_id(self, user_id: str) -> User | None:
+        return self.user_repo.get_by_id(user_id)
 

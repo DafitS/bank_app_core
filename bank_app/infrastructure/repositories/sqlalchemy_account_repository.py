@@ -18,7 +18,7 @@ class SqlAlchemyAccountRepository(AbstractAccountRepository):
             amount=Decimal(account.amount)        
         )
         self.session.add(orm)
-        self.session.commit()
+        self.session.flush()
         self.session.refresh(orm)
         return Account(
             account_id=orm.account_id,
@@ -55,7 +55,7 @@ class SqlAlchemyAccountRepository(AbstractAccountRepository):
     def update(self, account: Account) -> Account:
         orm = self.session.query(Accounts).filter_by(account_id=account.account_id).one()
         orm.amount = account.amount
-        self.session.commit()
+        self.session.flush()
         return Account(
             account_id=orm.account_id,
             account_number=orm.account_number,
@@ -65,7 +65,7 @@ class SqlAlchemyAccountRepository(AbstractAccountRepository):
         )
 
     def disable(self, account: Account) -> None:
-        try:
+
             orm = self.session.query(Accounts).filter_by(account_id=account.account_id).one_or_none()
 
             if not orm:
@@ -74,13 +74,9 @@ class SqlAlchemyAccountRepository(AbstractAccountRepository):
             
             orm.active = False
             orm.closed_at = datetime.now(timezone.utc)
+            self.session.flush()
 
             
-            self.session.commit()
-
-        except Exception:
-            self.session.rollback()
-            raise
 
     def list_all(self) -> list[Account]:
         orms = self.session.query(Accounts).all()

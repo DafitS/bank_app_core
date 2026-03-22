@@ -47,7 +47,7 @@ class AccountService:
         if not account:
             raise NotFoundError("Account not found")
         if not account.active:
-            raise NotFoundError("Account not found")
+            raise NotFoundError("Account is inactive")
         if amount <= 0:
             raise ValueError("Amount must be positive")
         

@@ -1,0 +1,6 @@
+$Env:URL="postgresql://postgres:1234@localhost:5432/bank_test_db"
+$Env:USER="postgres"
+$Env:DB="bank_test_db"
+$Env:PASSWORD="1234"
+$Env:SECRET_KEY="phaslo123haslo123"
+Write-Host "Zmienne Srodowiskowe Ustawione"

@@ -2,6 +2,7 @@ from bank_app.domain.services.account_service import AccountService
 from bank_app.domain.services.transaction_service import TransactionService
 from bank_app.infrastructure.db import SessionLocal
 from bank_app.infrastructure.repositories.sqlalchemy_account_repository import SqlAlchemyAccountRepository
+from bank_app.infrastructure.repositories.sqlalchemy_address_repository import SqlAlchemyAddressRepository
 from bank_app.infrastructure.repositories.sqlalchemy_transaction_repository import SqlAlchemyTransactionRepository
 from bank_app.infrastructure.uow import SQLAlchemyUnitOfWork
 from bank_app.infrastructure.repositories.sqlalchemy_user_repository import SqlAlchemyUserRepository
@@ -11,8 +12,9 @@ from bank_app.application.auth_service import AuthService
 def get_uow_user():
     with SQLAlchemyUnitOfWork(SessionLocal) as uow:
         user_repository = SqlAlchemyUserRepository(uow.session)
+        adress_repository = SqlAlchemyAddressRepository(uow.session)
         
-        yield UserService(user_repository)
+        yield UserService(user_repository, adress_repository)
 
 def get_uow_auth():
     with SQLAlchemyUnitOfWork(SessionLocal) as uow:
@@ -32,4 +34,4 @@ def get_uow_transaction():
         transaction_repository = SqlAlchemyTransactionRepository(uow.session)
         account_repository = SqlAlchemyAccountRepository(uow.session)
         
-        yield TransactionService(transaction_repository, account_repository)
+        yield TransactionService(account_repository, transaction_repository)
