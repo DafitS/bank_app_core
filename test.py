@@ -7,7 +7,7 @@ from bank_app.domain.services.account_service import AccountService
 from bank_app.domain.services.address_service import AddressService
 from bank_app.domain.services.transaction_service import TransactionService
 from bank_app.infrastructure.db import SessionLocal
-from bank_app.infrastructure.dependencies import get_uow_transaction
+from bank_app.infrastructure.dependencies import get_uow_transaction, get_uow_user
 from bank_app.infrastructure.repositories.sqlalchemy_account_repository import SqlAlchemyAccountRepository
 from bank_app.infrastructure.repositories.sqlalchemy_address_repository import SqlAlchemyAddressRepository
 from bank_app.infrastructure.repositories.sqlalchemy_operation_history_repository import SqlAlchemyOperationHistoryRepository
@@ -19,11 +19,27 @@ from bank_app.domain.services.user_service import UserService
 
 
 
-with get_uow_transaction() as service:
-    transaction = service.transfer(
-        account_from_number="39708947848719975035314715",
-        account_to_number="4974118641104482710041188",
-        amount=Decimal("200.00")
-    )
+with get_uow_user() as user_service:
+        user = user_service.create_user(
+            email="ttest@example.pl",
+            password="securepass",
+            first_name="Jan",
+            last_name="Kowalski"
+        )
 
-print(transaction)  # ✅ tylko jedna transakcja
+        address_service = AddressService(user_service.adress_repo)
+
+        address = address_service.create_address(
+            user_id=user.user_id,
+            street="ul. Główna 123",
+            city="Warszawa",
+            state="Mazowieckie",
+            zip_code="00-001"
+        )
+
+        print(user)
+        print(address)
+
+       
+    
+

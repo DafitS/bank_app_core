@@ -1,12 +1,14 @@
 from uuid import uuid4
 from bank_app.domain.entities.user import User
+from bank_app.domain.repositories.address_repository import AddressRepository
 from bank_app.domain.repositories.user_repository import UserRepository
 from bank_app.utils import pwd_context
 
 
 class UserService:
-    def __init__(self, user_repo: UserRepository):
+    def __init__(self, user_repo: UserRepository, adress_repo: AddressRepository):
         self.user_repo = user_repo
+        self.adress_repo = adress_repo
 
     def create_user(self, email: str, password: str, first_name: str = "", last_name: str = "") -> User:
     
