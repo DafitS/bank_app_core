@@ -2,7 +2,7 @@ from decimal import Decimal
 from uuid import UUID
 
 class Transaction:
-    def __init__(self, transaction_id: UUID, account_number_from: str, account_number_to: str, amount: Decimal):
+    def __init__(self, transaction_id: UUID, account_number_from: str, account_number_to: str, amount: Decimal, created_at=None):
         if amount <= 0:
             raise ValueError("Transaction amount must be > 0")
         if account_number_from == account_number_to:
@@ -11,3 +11,14 @@ class Transaction:
         self.account_number_from = account_number_from
         self.account_number_to = account_number_to
         self.amount = amount
+        self.created_at = created_at
+        
+
+    def __repr__(self):
+        return (
+            f"Transaction(id={self.transaction_id}, "
+            f"from={self.account_number_from}, "
+            f"to={self.account_number_to}, "
+            f"amount={self.amount})"
+            f"created_at={self.created_at})"
+        )

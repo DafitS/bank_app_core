@@ -1,15 +1,17 @@
 from decimal import Decimal
 import uuid
+from bank_app.infrastructure.orm.operation_history import OperationHistory
 from bank_app.domain.entities.transaction import Transaction
 from bank_app.domain.exceptions.custom_exceptions import NotFoundError, AmountTooSmallError
 
 class TransactionService:
-    def __init__(self, account_repo, transaction_repo):
+    def __init__(self, account_repo, transaction_repo, operation_repo):
         self.account_repo = account_repo
         self.transaction_repo = transaction_repo
+        self.operation_repo = operation_repo
 
     def transfer(self, account_from_number: str, account_to_number: str, amount: Decimal):
-        amount = Decimal(amount)
+        amount = Decimal(str(amount))
         account_from_number = str(account_from_number)
         account_to_number = str(account_to_number)
 
@@ -49,5 +51,25 @@ class TransactionService:
             account_from_id=account_from.account_id,
             account_to_id=account_to.account_id
         )
+
+        operation_out = OperationHistory(
+            operation_id=uuid.uuid4(),
+            account_id=account_from.account_id,
+            operation_type="transfer_out",
+            amount=amount,
+            account_from_id=account_from.account_id,
+            account_to_id=account_to.account_id
+        )
+        self.operation_repo.create(operation_out)
+
+        operation_in = OperationHistory(
+            operation_id=uuid.uuid4(),
+            account_id=account_to.account_id,
+            operation_type="transfer_in",
+            amount=amount,
+            account_from_id=account_from.account_id,
+            account_to_id=account_to.account_id
+        )
+        self.operation_repo.create(operation_in)
 
         return transaction

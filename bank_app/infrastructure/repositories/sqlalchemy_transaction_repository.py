@@ -17,12 +17,13 @@ class SqlAlchemyTransactionRepository(TransactionRepository):
             amount=transaction.amount
         )
         self.session.add(orm)
-        self.session.commit()
+        self.session.flush()
         self.session.refresh(orm)
 
         return Transaction(
             transaction_id=orm.transaction_id,
             account_number_from=transaction.account_number_from,
             account_number_to=transaction.account_number_to,
-            amount=orm.amount
+            amount=orm.amount,
+            created_at=orm.created_at
         )
