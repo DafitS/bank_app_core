@@ -19,3 +19,20 @@ class AddressService:
 
     def get_addresses_by_user_id(self, user_id: str):
         return self.address_repo.get_by_user_id(user_id)
+    
+    def get_address_by_id(self, address_id: str):
+        return self.address_repo.get_by_id(address_id)
+    
+    def update_address(self, address_id: str, street: str, city: str, state: str, zip_code: str):
+        address = self.address_repo.get_by_id(address_id)
+        if not address:
+            raise ValueError("Address not found")
+
+        address.street = street
+        address.city = city
+        address.state = state
+        address.zip_code = zip_code
+
+        return self.address_repo.update(address)
+
+        
