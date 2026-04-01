@@ -13,3 +13,6 @@ def generate_unique_account_number():
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
+# zrobic mapper z entity na orm i odwrotnie, zeby nie mieszac warstw

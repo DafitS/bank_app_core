@@ -7,13 +7,13 @@ class SqlAlchemyUserRepository(UserRepository):
     def __init__(self, session: Session):
         self.session = session
     
-    def create(self, user: User, password: str) -> User:
-        orm = Users(email=user.email, password=password, first_name=user.first_name, last_name=user.last_name)
+    def create(self, user: User) -> User:
+        orm = Users(email=user.email, password = user.password, first_name=user.first_name, last_name=user.last_name)
         self.session.add(orm)
         self.session.flush()
         
       
-        return User(user_id=orm.user_id, email=orm.email, first_name=orm.first_name, last_name=orm.last_name)
+        return User(user_id=orm.user_id, email=orm.email, first_name=orm.first_name, last_name=orm.last_name, password=orm.password)
 
     def get_by_id(self, user_id: str) -> User | None:
         orm = self.session.query(Users).filter_by(user_id=user_id).one_or_none()

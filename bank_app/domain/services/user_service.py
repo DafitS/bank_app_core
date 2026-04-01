@@ -1,4 +1,5 @@
 from uuid import uuid4
+from bank_app.domain.dto.user_dto import UserDTORequest, UserDTOResponse
 from bank_app.domain.entities.user import User
 from bank_app.domain.repositories.address_repository import AddressRepository
 from bank_app.domain.repositories.user_repository import UserRepository
@@ -10,13 +11,28 @@ class UserService:
         self.user_repo = user_repo
         self.address_repo = address_repo
 
-    def create_user(self, email: str, password: str, first_name: str = "", last_name: str = "") -> User:
+    def create_user(self, user_dto: UserDTORequest) -> User:
     
-        hashed = pwd_context.hash(password)
+        hashed = pwd_context.hash(user_dto.password)
     
-        user = User(user_id=uuid4(), email=email, first_name=first_name, last_name=last_name)
+        user = User(
+            email=user_dto.email,
+            first_name=user_dto.first_name,
+            last_name=user_dto.last_name,
+            password=hashed
+        )
 
-        return self.user_repo.create(user, hashed)
+        return_user =  self.user_repo.create(user)
+
+        user_dto_response = UserDTOResponse(
+            user_id=str(return_user.user_id),
+            email=return_user.email,
+            first_name=return_user.first_name,
+            last_name=return_user.last_name
+        )
+
+        return user_dto_response
+
 
     def get_users(self):
         return self.user_repo.list_all()

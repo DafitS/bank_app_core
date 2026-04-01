@@ -1,4 +1,5 @@
 from bank_app.domain.services.account_service import AccountService
+from bank_app.domain.services.address_service import AddressService
 from bank_app.domain.services.transaction_service import TransactionService
 from bank_app.infrastructure.db import SessionLocal
 from bank_app.infrastructure.repositories.sqlalchemy_account_repository import SqlAlchemyAccountRepository
@@ -44,3 +45,11 @@ def get_uow_transaction():
         operation_repository = SqlAlchemyOperationHistoryRepository(uow.session)
         
         yield TransactionService(account_repository, transaction_repository, operation_repository)
+
+
+@contextmanager
+def get_uow_address():
+    with SQLAlchemyUnitOfWork(SessionLocal) as uow:
+        address_repository = SqlAlchemyAddressRepository(uow.session)
+        
+        yield AddressService(address_repository)
