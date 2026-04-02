@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import Column, String, ForeignKey
+from sqlalchemy import Boolean, Column, String, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID 
 from sqlalchemy.orm import relationship
 
@@ -20,5 +20,6 @@ class Addresses(Base):
     city = Column(String(120), nullable=False)
     state = Column(String(120), nullable=False)
     zip_code = Column(String(20), nullable=False)
+    is_current = Column(Boolean, default=True)
 
     user = relationship("Users", back_populates="addresses")

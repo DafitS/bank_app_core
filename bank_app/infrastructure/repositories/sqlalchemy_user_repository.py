@@ -19,17 +19,17 @@ class SqlAlchemyUserRepository(UserRepository):
         orm = self.session.query(Users).filter_by(user_id=user_id).one_or_none()
         if not orm:
             return None
-        return User(user_id=orm.user_id, email=orm.email,  first_name=orm.first_name, last_name=orm.last_name)
+        return User(user_id=orm.user_id, email=orm.email,  first_name=orm.first_name, last_name=orm.last_name, password=orm.password)
 
     def get_by_email(self, email: str) -> User | None:
         orm = self.session.query(Users).filter_by(email=email).one_or_none()
         if not orm:
             return None
-        return User(user_id=orm.user_id, email=orm.email, first_name=orm.first_name, last_name=orm.last_name)
+        return User(user_id=orm.user_id, email=orm.email, first_name=orm.first_name, last_name=orm.last_name, password=orm.password)
 
     def list_all(self):
         users = self.session.query(Users).all()
-        return [User(user_id=u.user_id, email=u.email, first_name=u.first_name, last_name=u.last_name) for u in users]
+        return [User(user_id=u.user_id, email=u.email, first_name=u.first_name, last_name=u.last_name, password=u.password) for u in users]
 
     def update(self, user: User) -> User:
         orm = self.session.query(Users).filter_by(user_id=user.user_id).one_or_none()
@@ -40,7 +40,7 @@ class SqlAlchemyUserRepository(UserRepository):
         orm.first_name = user.first_name
         orm.last_name = user.last_name
         
-        return User(user_id=orm.user_id, email=orm.email, first_name=orm.first_name, last_name=orm.last_name)
+        return User(user_id=orm.user_id, email=orm.email, first_name=orm.first_name, last_name=orm.last_name, password=orm.password)
 
     def delete(self, user: User) -> None:
         orm = self.session.query(Users).filter_by(user_id=user.user_id).one_or_none()

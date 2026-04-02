@@ -49,7 +49,7 @@ class SqlAlchemyAddressRepository(AddressRepository):
         orm.city = address.city
         orm.state = address.state
         orm.zip_code = address.zip_code
-        self.session.commit()
+        self.session.flush()
         return Address(
             address_id=orm.address_id,
             user_id=orm.user_id,

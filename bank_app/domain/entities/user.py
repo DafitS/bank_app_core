@@ -9,3 +9,5 @@ class User(BaseModel):
     password: str
 
 
+#dodac walidację hasła np min 8 znakó specjalne itp, fieldwalidator, regex
+
