@@ -21,7 +21,7 @@ from bank_app.domain.dto.user_dto import UserDTORequest, UserDTOResponse
 from bank_app.domain.dto.user_dto import UserDTORequest, AddressDTO
 
 user = UserDTORequest(
-    email="tessst@example.pl",
+    email="losst@example.pl",
     password="Secure12s3!",
     first_name="Jan",
     last_name="Kowalski",
@@ -34,20 +34,9 @@ user = UserDTORequest(
 )
 with get_uow_user() as user_service:
         user = user_service.create_user(user)
-          
-        
-
-        """address_service = AddressService(user_service.adress_repo)
-
-        address = address_service.create_address(
-            user_id=user.user_id,
-            street="ul. Główna 123",
-            city="Warszawa",
-            state="Mazowieckie",
-            zip_code="00-001"
-        )
-"""
         print(user)
+
+        
        
 
        

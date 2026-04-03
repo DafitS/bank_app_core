@@ -64,17 +64,21 @@ class SqlAlchemyAddressRepository(AddressRepository):
         if orm:
             self.session.delete(orm)
 
-    def get_by_user_id(self, user_id: str):
-        orm_list = (
+    def get_by_user_id(self, user_id: UUID):
+        orm  = (
             self.session.query(Addresses)
-            .filter_by(user_id=user_id)
-            .all()
+            .filter_by(user_id=user_id, is_current=True)
+            .one_or_none()
         )
-        return [Address(
+
+        if not orm:
+            return None
+    
+        return Address(
             address_id=orm.address_id,
             user_id=orm.user_id,
             street=orm.street,
             city=orm.city,
             state=orm.state,
             zip_code=orm.zip_code
-        ) for orm in orm_list]
+        ) 
