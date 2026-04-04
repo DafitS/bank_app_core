@@ -1,3 +1,4 @@
+from sqlalchemy import UUID
 from sqlalchemy.orm import Session
 from bank_app.domain.entities.user import User
 from bank_app.domain.repositories.user_repository import UserRepository
@@ -15,7 +16,7 @@ class SqlAlchemyUserRepository(UserRepository):
       
         return User(user_id=orm.user_id, email=orm.email, first_name=orm.first_name, last_name=orm.last_name, password=orm.password)
 
-    def get_by_id(self, user_id: str) -> User | None:
+    def get_by_id(self, user_id: UUID) -> User | None:
         orm = self.session.query(Users).filter_by(user_id=user_id).one_or_none()
         if not orm:
             return None
@@ -39,6 +40,8 @@ class SqlAlchemyUserRepository(UserRepository):
         orm.password = user.password
         orm.first_name = user.first_name
         orm.last_name = user.last_name
+
+        self.session.flush()
         
         return User(user_id=orm.user_id, email=orm.email, first_name=orm.first_name, last_name=orm.last_name, password=orm.password)
 
@@ -46,4 +49,6 @@ class SqlAlchemyUserRepository(UserRepository):
         orm = self.session.query(Users).filter_by(user_id=user.user_id).one_or_none()
         if orm:
             self.session.delete(orm)
+
+            self.session.flush()
             

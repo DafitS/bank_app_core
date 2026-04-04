@@ -1,4 +1,5 @@
 from uuid import UUID, uuid4
+from bank_app.application.mappers.user_mapper import UserMapper
 from bank_app.domain.dto.user_dto import UserDTORequest, UserDTOResponse, UserDtoUpdate
 from bank_app.domain.entities.address import Address
 from bank_app.domain.entities.user import User
@@ -12,21 +13,6 @@ class UserService:
         self.user_repo = user_repo
         self.address_repo = address_repo
 
-
-    def _to_dto(self, user: User, address: Address | None) -> UserDTOResponse:
-
-        return UserDTOResponse(
-            user_id=str(user.user_id),
-            email=user.email,
-            first_name=user.first_name,
-            last_name=user.last_name,
-            address=address and {
-                "street": address.street,
-                "city": address.city,
-                "state": address.state,
-                "zip_code": address.zip_code,
-            }
-    )
 
     def create_user(self, user_dto: UserDTORequest) -> UserDTOResponse:
     
@@ -53,7 +39,7 @@ class UserService:
 
        
 
-        return self._to_dto(return_user, address)
+        return UserMapper.to_dto(return_user, address)
 
 
     def get_users(self) -> list[UserDTOResponse]:
@@ -62,7 +48,7 @@ class UserService:
         user_dtos = []
         for user in users:
             address = self.address_repo.get_by_user_id(user.user_id)
-            user_dtos.append(self._to_dto(user, address))
+            user_dtos.append(UserMapper.to_dto(user, address))
 
         return user_dtos
     
@@ -74,7 +60,7 @@ class UserService:
         
         address = self.address_repo.get_by_user_id(user_id)
 
-        return self._to_dto(user, address)
+        return UserMapper.to_dto(user, address)
 
     def get_user_by_email(self, email: str) -> UserDTOResponse | None:
         user = self.user_repo.get_by_email(email)
@@ -84,8 +70,8 @@ class UserService:
         
         address = self.address_repo.get_by_user_id(user.user_id)
 
-        return self._to_dto(user, address)
-    
+        return UserMapper.to_dto(user, address)
+
     def update_user(self, user_id: UUID, user_dto: UserDtoUpdate) -> UserDTOResponse | None:
         user = self.user_repo.get_by_id(user_id)
         
@@ -104,4 +90,4 @@ class UserService:
         updated_user = self.user_repo.update(user)
         address = self.address_repo.get_by_user_id(user_id)
 
-        return self._to_dto(updated_user, address)
+        return UserMapper.to_dto(updated_user, address)

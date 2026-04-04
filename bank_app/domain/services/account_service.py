@@ -1,5 +1,7 @@
 import uuid
 
+from bank_app.application.mappers.account_mapper import AccountMapper
+from bank_app.domain.dto.account_dto import AccountDTORequest, AccountDTOResponse
 from bank_app.infrastructure.orm.operation_history import OperationHistory
 from bank_app.domain.repositories.operation_history_repository import OperationHistoryRepository
 from bank_app.utils import generate_unique_account_number
@@ -14,31 +16,27 @@ class AccountService:
         self.user_repo = user_repo
         self.operation_repo = operation_repo
 
-    def create_account(self, user_id: UUID) -> Account:
-        user = self.user_repo.get_by_id(user_id)
+    def create_account(self, dto: AccountDTORequest) -> AccountDTOResponse:
+        user = self.user_repo.get_by_id(dto.user_id)
         if not user:
             raise NotFoundError("User not found")
 
-        from uuid import uuid4
+        account = AccountMapper.to_entity(dto)
 
-        account = Account(
-            account_id=str(uuid4()),             
-            account_number=str(generate_unique_account_number()),
-            user_id=user_id,
-            amount=Decimal(0),
-        )
+        saved_account = self.account_repo.create(account)
+        return AccountMapper.to_dto(saved_account)
 
-        return self.account_repo.create(account)
+    def get_accounts(self) -> list[AccountDTOResponse]:
+        accounts = self.account_repo.list_all()
+        return [AccountMapper.to_dto(account) for account in accounts]
 
-    def get_accounts(self):
-        return self.account_repo.list_all()
-
-    def get_by_number(self, number):
+    def get_by_number(self, number: str) -> AccountDTOResponse:
         account = self.account_repo.get_by_number(number)
         if not account:
             raise NotFoundError("Account not found")
-        return account
-    
+        
+        return AccountMapper.to_dto(account)
+
     def disable_account(self, number: str) -> None:
         account = self.account_repo.get_by_number(number)
 
@@ -46,19 +44,6 @@ class AccountService:
             raise NotFoundError("Account not found")
 
         self.account_repo.disable(account)
-
-    def deposit_account(self, number: str, amount: float):
-        account = self.account_repo.get_by_number(number)
-        if not account:
-            raise NotFoundError("Account not found")
-        if not account.active:
-            raise NotFoundError("Account is inactive")
-        if amount <= 0:
-            raise ValueError("Amount must be positive")
-        
-        account.amount += Decimal(str(amount))
-        updated_account = self.account_repo.update(account)
-        return updated_account
     
     def withdraw_account(self, number: str, amount: Decimal):
         account = self.account_repo.get_by_number(number)
@@ -83,7 +68,7 @@ class AccountService:
 
         self.operation_repo.create(operation)
 
-        return updated_account
+        return AccountMapper.to_dto(updated_account)
     
     def deposit_account(self, number: str, amount: Decimal):
         account = self.account_repo.get_by_number(number)
@@ -106,5 +91,5 @@ class AccountService:
 
         self.operation_repo.create(operation)
 
-        return updated_account
+        return AccountMapper.to_dto(updated_account)
         
