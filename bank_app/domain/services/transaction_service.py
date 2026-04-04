@@ -1,5 +1,7 @@
 from decimal import Decimal
 import uuid
+from bank_app.application.mappers.transaction_mapper import TransactionMapper
+from bank_app.domain.dto.transaction_dto import TransactionDTORequest, TransactionDTOResponse
 from bank_app.infrastructure.orm.operation_history import OperationHistory
 from bank_app.domain.entities.transaction import Transaction
 from bank_app.domain.exceptions.custom_exceptions import NotFoundError, AmountTooSmallError
@@ -10,10 +12,10 @@ class TransactionService:
         self.transaction_repo = transaction_repo
         self.operation_repo = operation_repo
 
-    def transfer(self, account_from_number: str, account_to_number: str, amount: Decimal):
-        amount = Decimal(str(amount))
-        account_from_number = str(account_from_number)
-        account_to_number = str(account_to_number)
+    def transfer(self, transfer_request: TransactionDTORequest) -> TransactionDTOResponse:
+        account_from_number = transfer_request.account_number_from
+        account_to_number = transfer_request.account_number_to
+        amount = Decimal(transfer_request.amount)
 
         if amount <= 0:
             raise AmountTooSmallError("Amount must be greater than 0")
@@ -39,12 +41,7 @@ class TransactionService:
         self.account_repo.update(account_to)
 
         
-        transaction = Transaction(
-            transaction_id=uuid.uuid4(),
-            account_number_from=account_from.account_number,
-            account_number_to=account_to.account_number,
-            amount=amount
-        )
+        transaction = TransactionMapper.from_request(transfer_request)
 
         transaction = self.transaction_repo.create(
             transaction,
@@ -72,4 +69,4 @@ class TransactionService:
         )
         self.operation_repo.create(operation_in)
 
-        return transaction
+        return TransactionMapper.to_dto(transaction)
