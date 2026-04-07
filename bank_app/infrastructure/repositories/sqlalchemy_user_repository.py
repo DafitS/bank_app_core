@@ -1,6 +1,7 @@
 from sqlalchemy import UUID
 from sqlalchemy.orm import Session
 from bank_app.domain.entities.user import User
+from bank_app.domain.exceptions.custom_exceptions import NotFoundError
 from bank_app.domain.repositories.user_repository import UserRepository
 from bank_app.infrastructure.orm.user import Users
 
@@ -35,7 +36,8 @@ class SqlAlchemyUserRepository(UserRepository):
     def update(self, user: User) -> User:
         orm = self.session.query(Users).filter_by(user_id=user.user_id).one_or_none()
         if not orm:
-            return None
+            raise NotFoundError("User not found")
+        
         orm.email = user.email
         orm.password = user.password
         orm.first_name = user.first_name

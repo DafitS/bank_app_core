@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from uuid import UUID
 from bank_app.domain.entities.user import User
 from bank_app.domain.entities.address import Address
+from bank_app.domain.exceptions.custom_exceptions import NotFoundError
 from bank_app.domain.repositories.address_repository import AddressRepository
 from bank_app.infrastructure.orm.address import Addresses
 
@@ -44,7 +45,8 @@ class SqlAlchemyAddressRepository(AddressRepository):
     def update(self, address: Address) -> Address:
         orm = self.session.query(Addresses).filter_by(address_id=address.address_id).one_or_none()
         if not orm:
-            return None
+            raise NotFoundError("Address not found")
+        
         orm.street = address.street
         orm.city = address.city
         orm.state = address.state
@@ -63,6 +65,8 @@ class SqlAlchemyAddressRepository(AddressRepository):
         orm = self.session.query(Addresses).filter_by(address_id=address.address_id).one_or_none()
         if orm:
             self.session.delete(orm)
+
+            self.session.flush()
 
     def get_by_user_id(self, user_id: UUID):
         orm  = (
