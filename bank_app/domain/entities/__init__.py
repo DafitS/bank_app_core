@@ -1,6 +1,6 @@
 from .account import Account
+from .operation_history import OperationHistory
 from .transaction import Transaction
 from .user import User
-from .operation_history import OperationHistory
 
-__all__ = ["Account", "Transaction", "User", "OperationHistory"]
+__all__ = ["Account", "OperationHistory", "Transaction", "User"]

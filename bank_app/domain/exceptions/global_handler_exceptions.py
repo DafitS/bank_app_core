@@ -1,15 +1,16 @@
 from fastapi import Request, status
 from fastapi.responses import JSONResponse
 
-from bank_app.domain.exceptions.custom_exceptions import (
-    NotFoundError,
-    DuplicatedError,
-    DatabaseError,
-    AmountTooSmallError,
-    ErrorConversionType,
-    AuthenticationException,
-)
 from bank_app.domain.exceptions.base import DomainError
+from bank_app.domain.exceptions.custom_exceptions import (
+    AmountTooSmallError,
+    AuthenticationException,
+    DatabaseError,
+    DuplicatedError,
+    ErrorConversionType,
+    NotFoundError,
+)
+
 
 def register_exception_handlers(app):
 
@@ -54,7 +55,7 @@ def register_exception_handlers(app):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={"detail": "Database error"},
         )
-    
+
     @app.exception_handler(DomainError)
     async def domain_handler(request: Request, exc: DomainError):
         return JSONResponse(

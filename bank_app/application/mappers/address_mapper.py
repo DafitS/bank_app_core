@@ -1,5 +1,6 @@
-from bank_app.domain.entities.address import Address
 from bank_app.domain.dto.address_dto import AddressDTORequest, AddressDTOResponse
+from bank_app.domain.entities.address import Address
+
 
 class AddressMapper:
 

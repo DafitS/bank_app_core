@@ -9,14 +9,14 @@ from bank_app.utils import generate_unique_account_number
 class AccountMapper:
     @staticmethod
     def to_dto(account: Account) -> AccountDTOResponse:
-            return AccountDTOResponse(
-                account_id=account.account_id,
-                account_number=account.account_number,
-                user_id=account.user_id,
-                amount=account.amount,
-                active=account.active
-            )
-    
+        return AccountDTOResponse(
+            account_id=account.account_id,
+            account_number=account.account_number,
+            user_id=account.user_id,
+            amount=account.amount,
+            active=account.active
+        )
+
     @staticmethod
     def to_entity(dto: AccountDTORequest) -> Account:
         return Account(

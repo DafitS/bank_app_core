@@ -7,7 +7,7 @@ from bank_app.domain.entities.address import Address
 
 
 class AddressRepository(ABC):
-    
+
     @abstractmethod
     def create(self, address: Address) -> Address:
         raise NotImplementedError
@@ -23,7 +23,7 @@ class AddressRepository(ABC):
     @abstractmethod
     def delete(self, address: Address) -> None:
         raise NotImplementedError
-    
+
     @abstractmethod
     def get_by_user_id(self, user_id: str):
         raise NotImplementedError

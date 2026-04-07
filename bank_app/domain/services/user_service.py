@@ -1,4 +1,5 @@
 from uuid import UUID, uuid4
+
 from bank_app.application.mappers.user_mapper import UserMapper
 from bank_app.domain.dto.user_dto import UserDTORequest, UserDTOResponse, UserDtoUpdate
 from bank_app.domain.entities.address import Address
@@ -13,11 +14,10 @@ class UserService:
         self.user_repo = user_repo
         self.address_repo = address_repo
 
-
     def create_user(self, user_dto: UserDTORequest) -> UserDTOResponse:
-    
+
         hashed = pwd_context.hash(user_dto.password)
-    
+
         user = User(
             email=user_dto.email,
             first_name=user_dto.first_name,
@@ -25,7 +25,7 @@ class UserService:
             password=hashed
         )
 
-        return_user =  self.user_repo.create(user)
+        return_user = self.user_repo.create(user)
 
         address = Address(
             address_id=uuid4(),
@@ -37,10 +37,7 @@ class UserService:
         )
         self.address_repo.create(address)
 
-       
-
         return UserMapper.to_dto(return_user, address)
-
 
     def get_users(self) -> list[UserDTOResponse]:
         users = self.user_repo.list_all()
@@ -51,33 +48,34 @@ class UserService:
             user_dtos.append(UserMapper.to_dto(user, address))
 
         return user_dtos
-    
+
     def get_user_by_id(self, user_id: UUID) -> UserDTOResponse | None:
         user = self.user_repo.get_by_id(user_id)
-        
+
         if not user:
             return None
-        
+
         address = self.address_repo.get_by_user_id(user_id)
 
         return UserMapper.to_dto(user, address)
 
     def get_user_by_email(self, email: str) -> UserDTOResponse | None:
         user = self.user_repo.get_by_email(email)
-        
+
         if not user:
             return None
-        
+
         address = self.address_repo.get_by_user_id(user.user_id)
 
         return UserMapper.to_dto(user, address)
 
-    def update_user(self, user_id: UUID, user_dto: UserDtoUpdate) -> UserDTOResponse | None:
+    def update_user(self, user_id: UUID,
+                    user_dto: UserDtoUpdate) -> UserDTOResponse | None:
         user = self.user_repo.get_by_id(user_id)
-        
+
         if not user:
             return None
-        
+
         if user_dto.first_name is not None:
             user.first_name = user_dto.first_name
         if user_dto.last_name is not None:

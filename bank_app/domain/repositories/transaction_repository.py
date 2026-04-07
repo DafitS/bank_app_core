@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Optional, List
-from uuid import UUID
+
 from bank_app.domain.entities.transaction import Transaction
+
 
 class TransactionRepository(ABC):
     @abstractmethod
@@ -16,4 +16,3 @@ class TransactionRepository(ABC):
             Transaction: The created transaction with assigned ID.
         """
         pass
-

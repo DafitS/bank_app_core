@@ -1,6 +1,6 @@
+import uuid
 from datetime import datetime
 from decimal import Decimal
-import uuid
 
 
 class OperationHistory:
@@ -10,9 +10,9 @@ class OperationHistory:
         account_id: int,
         operation_type: str,
         amount: Decimal,
-        account_from_id: str = None,
-        account_to_id: str = None,
-        created_at: datetime = None
+        account_from_id: str | None = None,
+        account_to_id: str | None = None,
+        created_at: datetime | None = None
     ):
         self.id = id
         self.account_id = account_id

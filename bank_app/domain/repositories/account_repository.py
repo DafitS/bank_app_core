@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Optional, List
+
 from bank_app.domain.entities import Account
+
 
 class AbstractAccountRepository(ABC):
     @abstractmethod
@@ -17,7 +18,7 @@ class AbstractAccountRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_number(self, account_number: str) -> Optional[Account]:
+    def get_by_number(self, account_number: str) -> Account | None:
         """
         Retrieve an account by its account number.
 
@@ -29,7 +30,6 @@ class AbstractAccountRepository(ABC):
         """
         pass
 
-    
     @abstractmethod
     def update(self, account: Account) -> Account:
         """
@@ -44,7 +44,7 @@ class AbstractAccountRepository(ABC):
         pass
 
     @abstractmethod
-    def list_all(self) -> List[Account]:
+    def list_all(self) -> list[Account]:
         """
         List all accounts in the system.
 

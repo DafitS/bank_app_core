@@ -10,6 +10,7 @@ class AddressDTORequest(BaseModel):
     state: str
     zip_code: str
 
+
 class AddressDTOResponse(BaseModel):
     address_id: str
     user_id: str

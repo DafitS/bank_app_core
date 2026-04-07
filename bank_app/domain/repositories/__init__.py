@@ -1,6 +1,9 @@
-from .user_repository import UserRepository
 from .account_repository import AbstractAccountRepository
-from .transaction_repository import TransactionRepository
 from .address_repository import AddressRepository
+from .transaction_repository import TransactionRepository
+from .user_repository import UserRepository
 
-__all__ = ["UserRepository", "AbstractAccountRepository", "TransactionRepository", "AddressRepository"]
+__all__ = ["AbstractAccountRepository",
+            "AddressRepository",
+            "TransactionRepository",
+            "UserRepository"]
