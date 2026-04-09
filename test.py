@@ -21,8 +21,8 @@ from bank_app.domain.dto.user_dto import UserDTORequest, UserDTOResponse
 from bank_app.domain.dto.user_dto import UserDTORequest, AddressDTO
 
 user = UserDTORequest(
-    email="testtt@example.pl",
-    password="Secure12s3!",
+    email="localtettt@example.pl",
+    password="Secure12s3",
     first_name="Jan",
     last_name="Kowalski",
     address=AddressDTO(

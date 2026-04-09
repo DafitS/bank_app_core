@@ -1,6 +1,7 @@
+import re
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
 class User(BaseModel):
@@ -11,4 +12,6 @@ class User(BaseModel):
     password: str
 
 
-# dodac walidację hasła np min 8 znakó specjalne itp, fieldwalidator, regex
+
+
+
