@@ -1,13 +1,17 @@
-from uuid import UUID
-from pydantic import EmailStr  
+import re
+from uuid import UUID, uuid4
 
-class User:
-    def __init__(self, user_id: UUID, email: str, password: str):
-        if not email:
-            raise ValueError("Email is required")
-        if not password:
-            raise ValueError("Password cannot be empty")
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
-        self.user_id = user_id
-        self.email = email
-        self.password = password  
+
+class User(BaseModel):
+    user_id: UUID = Field(default_factory=uuid4)
+    email: EmailStr
+    first_name: str
+    last_name: str
+    password: str
+
+
+
+
+

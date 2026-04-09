@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Optional, List
+
 from bank_app.domain.entities import User
+
 
 class UserRepository(ABC):
     @abstractmethod
@@ -17,7 +18,7 @@ class UserRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_id(self, user_id: int) -> Optional[User]:
+    def get_by_id(self, user_id: int) -> User | None:
         """
         Retrieve a user by ID.
 
@@ -30,7 +31,7 @@ class UserRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_email(self, email: str) -> Optional[User]:
+    def get_by_email(self, email: str) -> User | None:
         """
         Retrieve a user by email.
 
@@ -43,7 +44,7 @@ class UserRepository(ABC):
         pass
 
     @abstractmethod
-    def list_all(self) -> List[User]:
+    def list_all(self) -> list[User]:
         """
         List all users.
 

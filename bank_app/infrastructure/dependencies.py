@@ -1,35 +1,55 @@
 from bank_app.domain.services.account_service import AccountService
+from bank_app.domain.services.address_service import AddressService
 from bank_app.domain.services.transaction_service import TransactionService
 from bank_app.infrastructure.db import SessionLocal
 from bank_app.infrastructure.repositories.sqlalchemy_account_repository import SqlAlchemyAccountRepository
+from bank_app.infrastructure.repositories.sqlalchemy_address_repository import SqlAlchemyAddressRepository
+from bank_app.infrastructure.repositories.sqlalchemy_operation_history_repository import SqlAlchemyOperationHistoryRepository
 from bank_app.infrastructure.repositories.sqlalchemy_transaction_repository import SqlAlchemyTransactionRepository
 from bank_app.infrastructure.uow import SQLAlchemyUnitOfWork
 from bank_app.infrastructure.repositories.sqlalchemy_user_repository import SqlAlchemyUserRepository
 from bank_app.domain.services.user_service import UserService
 from bank_app.application.auth_service import AuthService
+from contextlib import contextmanager
 
+@contextmanager
 def get_uow_user():
     with SQLAlchemyUnitOfWork(SessionLocal) as uow:
         user_repository = SqlAlchemyUserRepository(uow.session)
+        adress_repository = SqlAlchemyAddressRepository(uow.session)
         
-        yield UserService(user_repository)
+        yield UserService(user_repository, adress_repository)
 
+@contextmanager
 def get_uow_auth():
     with SQLAlchemyUnitOfWork(SessionLocal) as uow:
         user_repository = SqlAlchemyUserRepository(uow.session)
         
         yield AuthService(user_repository)
 
+@contextmanager
 def get_uow_account():
     with SQLAlchemyUnitOfWork(SessionLocal) as uow:
         account_repository = SqlAlchemyAccountRepository(uow.session)
         user_repository = SqlAlchemyUserRepository(uow.session)
+        operation_repository = SqlAlchemyOperationHistoryRepository(uow.session)
         
-        yield AccountService(account_repository, user_repository)
+        yield AccountService(account_repository, user_repository, operation_repository)
 
+
+@contextmanager
 def get_uow_transaction():
     with SQLAlchemyUnitOfWork(SessionLocal) as uow:
         transaction_repository = SqlAlchemyTransactionRepository(uow.session)
         account_repository = SqlAlchemyAccountRepository(uow.session)
+        operation_repository = SqlAlchemyOperationHistoryRepository(uow.session)
         
-        yield TransactionService(transaction_repository, account_repository)
+        yield TransactionService(account_repository, transaction_repository, operation_repository)
+
+
+@contextmanager
+def get_uow_address():
+    with SQLAlchemyUnitOfWork(SessionLocal) as uow:
+        address_repository = SqlAlchemyAddressRepository(uow.session)
+        
+        yield AddressService(address_repository)

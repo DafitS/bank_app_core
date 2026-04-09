@@ -1,7 +1,10 @@
-from sqlalchemy import Column, Numeric, String, ForeignKey, CheckConstraint
+import datetime
+
+from sqlalchemy import Column, DateTime, Numeric, String, ForeignKey, CheckConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from .base import Base
+from datetime import datetime, timezone
 import uuid
 
 class Transactions(Base):
@@ -14,5 +17,7 @@ class Transactions(Base):
 
     account_from = relationship("Accounts", foreign_keys=[account_id_from])
     account_to = relationship("Accounts", foreign_keys=[account_id_to])
+
+    created_at = Column(DateTime, default=datetime.utcnow)
 
     __table_args__ = (CheckConstraint("amount > 0"),)
